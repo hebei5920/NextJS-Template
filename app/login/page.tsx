@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { AuthButton } from '@/components/auth/AuthButton'
-import { useAuth } from '@/lib/hooks/useAuth'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function LoginPage() {
   const { user, loading } = useAuth()

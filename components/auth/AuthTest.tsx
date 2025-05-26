@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuth } from '@/lib/hooks/useAuth'
+import { useAuth } from '@/hooks/useAuth'
 import { createClient } from '@/lib/supabase-client'
 import { Button } from '@/components/ui/button'
 

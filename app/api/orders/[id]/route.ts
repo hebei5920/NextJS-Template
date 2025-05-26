@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase-server';
-import { OrderService } from '@/lib/auth/order-service';
+import { OrderService } from '@/lib/order-service';
 
 // GET - 获取单个订单
 export async function GET(
