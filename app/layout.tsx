@@ -1,15 +1,15 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { ThemeProvider } from '@/components/theme-provider';
-import { LanguageProvider } from '@/components/language-provider';
+import { ThemeProvider } from '@/providers/theme-provider';
+import { LanguageProvider } from '@/providers/language-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Next.js 基础框架',
-  description: '包含国际化、主题切换等基础功能的 Next.js 项目模板',
-  keywords: 'Next.js, React, TypeScript, 国际化, 主题切换',
+  title: 'NextJs',
+  description: 'NextJs',
+  keywords: 'NextJs',
 };
 
 export default function RootLayout({

@@ -1,0 +1,6 @@
+export default {
+    // 导航
+    nav: {
+      settings: '設定'
+    },
+  }; 
