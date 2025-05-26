@@ -19,8 +19,10 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`${origin}/auth/error?error=${encodeURIComponent(error.message)}`)
       }
 
+
       if (data.user) {
         try {
+
           // 使用我们的认证处理器处理用户
           await AuthHandler.handleOAuthCallback(data.user)
 
@@ -45,4 +47,6 @@ export async function GET(request: Request) {
 
   // 没有授权码，重定向到错误页面
   return NextResponse.redirect(`${origin}/auth/error?error=${encodeURIComponent('缺少授权码')}`)
-} 
+}
+
+
