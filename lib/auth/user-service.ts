@@ -192,4 +192,70 @@ export class UserService {
       where: { supabaseId }
     });
   }
+
+  /**
+   * 更新用户积分
+   */
+  static async updateUserCredits(userId: string, credits: number): Promise<any> {
+    try {
+      const updatedUser = await prisma.user.update({
+        where: { supabaseId: userId },
+        data: { credits }
+      });
+      return updatedUser;
+    } catch (error) {
+      console.error('Error updating user credits:', error);
+      throw new Error('更新用户积分失败');
+    }
+  }
+
+  /**
+   * 增加用户积分
+   */
+  static async addUserCredits(supabaseId: string, amount: number): Promise<any> {
+    try {
+      const updatedUser = await prisma.user.update({
+        where: { supabaseId },
+        data: {
+          credits: {
+            increment: amount
+          }
+        }
+      });
+      return updatedUser;
+    } catch (error) {
+      console.error('Error adding user credits:', error);
+      throw new Error('增加用户积分失败');
+    }
+  }
+
+  /**
+   * 扣减用户积分
+   */
+  static async deductUserCredits(userId: number, amount: number): Promise<any> {
+    try {
+      // 先检查用户当前积分
+      const user = await this.getUserById(userId);
+      if (!user) {
+        throw new Error('用户不存在');
+      }
+
+      if (user.credits < amount) {
+        throw new Error('积分不足');
+      }
+
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: {
+          credits: {
+            decrement: amount
+          }
+        }
+      });
+      return updatedUser;
+    } catch (error) {
+      console.error('Error deducting user credits:', error);
+      throw error;
+    }
+  }
 } 

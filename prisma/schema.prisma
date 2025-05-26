@@ -24,7 +24,7 @@ model User {
   
   
   // GitHub specific fields
-  githubUsername  String?  @map("github_username")
+  githubUsername  String?  @map("github_user_name")
   githubId        Int?     @map("github_id") // GitHub user ID
   
   // Google specific fields

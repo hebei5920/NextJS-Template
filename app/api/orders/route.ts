@@ -1,6 +1,19 @@
+import Stripe from 'stripe';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase-server';
 import { OrderService } from '@/lib/auth/order-service';
+import { UserService } from '@/lib/auth/user-service';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+  apiVersion: "2025-04-30.basil"
+})
+
+const PRODUCT_TOKEN_LIST = [
+  { key: 'prod_SL2WEtUTGlLgST', value: 100 },
+  { key: 'prod_SL2Wik94PZXSNa', value: 700 }
+]
+
+
 
 // GET - 获取用户订单
 export async function GET(request: NextRequest) {
@@ -47,44 +60,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 解析请求体
-    const body = await request.json();
-    const {
-      price,
-      product,
-      payEmail,
-      payName,
-      payCurrency
-    } = body;
 
-    // 验证必填字段
-    if (!product) {
-      return NextResponse.json(
-        { error: 'Product is required' },
-        { status: 400 }
-      );
+    const rawBody = await request.text()
+    const signature = request.headers.get("stripe-signature") || ""
+
+    const event = stripe.webhooks.constructEvent(
+      rawBody,
+      signature,
+      process.env.STRIPE_WEBHOOK_KEY || ""
+    )
+
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object
+      const line_items = await stripe.checkout.sessions.listLineItems(session.id);
+      const promises = line_items.data.map(async (ele) => {
+        const pId = ele.price?.product as string
+        let v = PRODUCT_TOKEN_LIST.find(i => i.key === pId)?.value || 0
+
+        await OrderService.createOrder({
+          userId: session.client_reference_id || user.id,
+          price: session.amount_total || undefined,
+          payEmail: session.customer_details?.email || undefined,
+          payName: session.customer_details?.name || undefined,
+          product: pId,
+          payCurrency: session.currency || undefined,
+          status: 'completed',
+          createDate: new Date(),
+          updateDate: new Date()
+        })
+        await UserService.addUserCredits(session.client_reference_id || user.id, v)
+
+      });
+
+      await Promise.all(promises);
+      return NextResponse.json('success', { status: 200 })
     }
 
-    // 创建订单数据
-    const currentTime = new Date();
-    const orderData = {
-      userId: user.id,
-      price: price || null,
-      product,
-      payEmail: payEmail || null,
-      payName: payName || null,
-      payCurrency: payCurrency || null,
-      createDate: currentTime,
-      updateDate: currentTime
-    };
 
-    // 创建订单
-    const newOrder = await OrderService.createOrder(orderData);
-
-    return NextResponse.json({
-      order: newOrder,
-      success: true
-    }, { status: 201 });
+    return NextResponse.json('method not found', { status: 404 })
 
   } catch (error) {
     console.error('Error creating order:', error);
