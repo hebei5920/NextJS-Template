@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+        
+    
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+
+  // OAuth Provider Information
+  supabaseId      String?  @unique @map("supabase_id") // Supabase Auth user ID
+  provider        String?  // "google", "github", "email", etc.
+  providerUserId  String?  @map("provider_user_id") // Provider's unique user ID
+  
+  // Profile Information
+  avatarUrl       String?  @map("avatar_url")
+  username        String?  @unique // GitHub username or display name
+  
+  
+  // GitHub specific fields
+  githubUsername  String?  @map("github_username")
+  githubId        Int?     @map("github_id") // GitHub user ID
+  
+  // Google specific fields
+  googleId        String?  @map("google_id") // Google user ID
+  
+  // Account status
+  emailVerified   Boolean  @default(false) @map("email_verified")
+  isActive        Boolean  @default(true) @map("is_active")
+  
+  // Timestamps
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  lastLoginAt     DateTime? @map("last_login_at")
+
+  @@map("users")
+}
