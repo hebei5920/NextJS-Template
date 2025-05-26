@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { UserProcessor } from './user-processor';
+import { UserProcessor } from '../lib/user-processor';
 
 // 如果没有全局 Prisma 实例，创建一个
 declare global {

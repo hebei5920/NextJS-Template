@@ -3,7 +3,7 @@ import { UserService } from './user-service';
 /**
  * 认证处理器 - 处理用户登录回调和认证逻辑
  */
-export class AuthHandler {
+export class AuthService {
 
   /**
    * 处理 OAuth 登录回调
@@ -95,7 +95,7 @@ export class AuthHandler {
  *     
  *     if (data.user && !error) {
  *       // 处理用户登录
- *       const result = await AuthHandler.handleOAuthCallback(data.user);
+ *       const result = await AuthService.handleOAuthCallback(data.user);
  *       
  *       // 重定向到应用
  *       return NextResponse.redirect('/dashboard');
@@ -111,7 +111,7 @@ export class AuthHandler {
  *   const { data: { user } } = await supabase.auth.getUser();
  *   
  *   if (user) {
- *     const userInfo = await AuthHandler.getUserInfo(user.id);
+ *     const userInfo = await AuthService.getUserInfo(user.id);
  *     return NextResponse.json({ user: userInfo });
  *   }
  *   

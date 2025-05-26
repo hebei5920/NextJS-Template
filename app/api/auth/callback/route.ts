@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase-server'
 import { NextResponse } from 'next/server'
-import { AuthHandler } from '@/lib/auth-handler'
+import { AuthService } from '@/service/auth-service'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
         try {
 
           // 使用我们的认证处理器处理用户
-          await AuthHandler.handleOAuthCallback(data.user)
+          await AuthService.handleOAuthCallback(data.user)
 
           return NextResponse.redirect(`${origin}${next}`)
 

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase-server'
-import { AuthHandler } from '@/lib/auth-handler'
+import { AuthService } from '@/service/auth-service'
 
 export async function GET() {
   try {
@@ -16,7 +16,7 @@ export async function GET() {
     }
 
     // 获取数据库中的用户信息
-    const userInfo = await AuthHandler.getUserInfo(user.id)
+    const userInfo = await AuthService.getUserInfo(user.id)
 
     if (!userInfo) {
       return NextResponse.json(
