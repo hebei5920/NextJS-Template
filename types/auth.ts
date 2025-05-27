@@ -67,7 +67,7 @@ export interface DatabaseUser {
   googleId: string | null;
   emailVerified: boolean;
   isActive: boolean;
-  credits: number;
+  credits: number; // 用户余额/积分，支持一位小数
   plan: string;
   createdAt: Date;
   updatedAt: Date;
@@ -87,7 +87,7 @@ export interface CreateUserData {
   githubId?: number;
   googleId?: string;
   emailVerified?: boolean;
-  credits?: number;
+  credits?: number; // 用户余额/积分，支持一位小数
   plan?: string;
 }
 
@@ -100,7 +100,7 @@ export interface UpdateUserData {
   googleId?: string;
   emailVerified?: boolean;
   lastLoginAt?: Date;
-  credits?: number;
+  credits?: number; // 用户余额/积分，支持一位小数
   plan?: string;
 }
 

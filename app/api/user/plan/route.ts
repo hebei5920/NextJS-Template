@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase-server';
 import { UserService } from '@/service/user-service';
+import { formatCredits } from '@/lib/utils';
 
 // GET - 获取用户套餐信息
 export async function GET() {
@@ -28,7 +29,7 @@ export async function GET() {
 
     return NextResponse.json({ 
       plan: userInfo.plan,
-      credits: userInfo.credits,
+      credits: parseFloat(formatCredits(userInfo.credits)),
       success: true 
     });
 
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({ 
         plan: updatedUser.plan,
-        credits: updatedUser.credits,
+        credits: parseFloat(formatCredits(updatedUser.credits)),
         success: true 
       });
     } catch (serviceError: any) {

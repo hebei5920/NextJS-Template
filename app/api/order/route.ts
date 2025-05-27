@@ -50,15 +50,15 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // 验证用户身份
-    const supabase = createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    // const supabase = createClient();
+    // const { data: { user }, error } = await supabase.auth.getUser();
 
-    if (error || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    // if (error || !user) {
+    //   return NextResponse.json(
+    //     { error: 'Unauthorized' },
+    //     { status: 401 }
+    //   );
+    // }
 
 
     const rawBody = await request.text()
@@ -69,16 +69,19 @@ export async function POST(request: NextRequest) {
       signature,
       process.env.STRIPE_WEBHOOK_KEY || ""
     )
+    console.log("++++++++++++++++1");
 
     if (event.type === "checkout.session.completed") {
       const session = event.data.object
       const line_items = await stripe.checkout.sessions.listLineItems(session.id);
       const promises = line_items.data.map(async (ele) => {
+        console.log("++++++++++++++++2", ele);
         const pId = ele.price?.product as string
         let v = PRODUCT_TOKEN_LIST.find(i => i.key === pId)?.value || 0
 
+
         await OrderService.createOrder({
-          userId: session.client_reference_id || user.id,
+          userId: session.client_reference_id || "",
           price: session.amount_total || undefined,
           payEmail: session.customer_details?.email || undefined,
           payName: session.customer_details?.name || undefined,
@@ -88,7 +91,9 @@ export async function POST(request: NextRequest) {
           createDate: new Date(),
           updateDate: new Date()
         })
-        await UserService.addUserCredits(session.client_reference_id || user.id, v)
+        console.log("v", v);
+
+        await UserService.addUserCredits(session.client_reference_id || "", v)
 
       });
 

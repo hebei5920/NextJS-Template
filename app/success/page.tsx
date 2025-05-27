@@ -136,7 +136,7 @@ export default function PaymentSuccessPage() {
           <div className="space-y-4 mb-8">
             <h3 className="text-lg font-semibold mb-4">接下来您可以：</h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
               <button
                 onClick={goToVoiceCloning}
                 className="btn-primary flex items-center justify-center gap-2 py-3"
@@ -160,24 +160,7 @@ export default function PaymentSuccessPage() {
               <li>• 您可以随时在账户设置中管理您的订阅</li>
             </ul>
           </div>
-
-          {/* 导航按钮 */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={goHome}
-              className="btn-secondary"
-            >
-              返回首页
-            </button>
-
-            <button
-              onClick={() => window.print()}
-              className="btn-secondary flex items-center gap-2"
-            >
-              <Download className="w-4 h-4" />
-              保存凭证
-            </button>
-          </div>
+ 
 
           {/* 联系信息 */}
           <div className="mt-12 text-center text-sm text-muted-foreground">

@@ -198,9 +198,12 @@ export class UserService {
    */
   static async updateUserCredits(userId: string, credits: number): Promise<any> {
     try {
+      // 确保积分保留一位小数
+      const formattedCredits = Math.round(credits * 10) / 10;
+      
       const updatedUser = await prisma.user.update({
         where: { supabaseId: userId },
-        data: { credits }
+        data: { credits: formattedCredits }
       });
       return updatedUser;
     } catch (error) {
@@ -214,11 +217,17 @@ export class UserService {
    */
   static async addUserCredits(supabaseId: string, amount: number): Promise<any> {
     try {
+      console.log("supabaseId",supabaseId);
+      console.log("amount",amount);
+      
+      // 确保积分保留一位小数
+      const formattedAmount = Math.round(amount * 10) / 10;
+      
       const updatedUser = await prisma.user.update({
         where: { supabaseId },
         data: {
           credits: {
-            increment: amount
+            increment: formattedAmount
           }
         }
       });
@@ -234,13 +243,16 @@ export class UserService {
    */
   static async deductUserCredits(userId: number, amount: number): Promise<any> {
     try {
+      // 确保积分保留一位小数
+      const formattedAmount = Math.round(amount * 10) / 10;
+      
       // 先检查用户当前积分
       const user = await this.getUserById(userId);
       if (!user) {
         throw new Error('用户不存在');
       }
 
-      if (user.credits < amount) {
+      if (user.credits < formattedAmount) {
         throw new Error('积分不足');
       }
 
@@ -248,7 +260,7 @@ export class UserService {
         where: { id: userId },
         data: {
           credits: {
-            decrement: amount
+            decrement: formattedAmount
           }
         }
       });
