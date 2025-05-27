@@ -1,57 +1,35 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useTranslation } from '@/providers/language-provider';
-import { useAuth } from '@/hooks/useAuth';
 import { VoiceCloningStudio } from '@/components/voice-cloning/voice-cloning-studio';
 import { PricingPlans } from '@/components/pricing/pricing-plans';
-import { GenerationHistory } from '@/components/voice-cloning/generation-history';
-import { ThemeSwitcher } from '@/components/ui/theme-switcher';
-import { LanguageSwitcher } from '@/components/ui/language-switcher';
-import { Sparkles, Mic, Upload, Type, Star, Shield, Zap, User, LogIn, LogOut } from 'lucide-react';
-import Link from 'next/link';
+import { FAQ } from '@/components/ui/faq';
+import { Navbar } from '@/components/ui/navbar';
+import { Sparkles, Mic, Upload, Type, Star, Shield, Zap } from 'lucide-react';
 
 export default function Home() {
   const { t } = useTranslation();
-  const { user, loading, signOut } = useAuth();
+
+  // 处理URL中的锚点
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      const targetId = hash.replace('#', '');
+      const element = document.getElementById(targetId);
+      if (element) {
+        // 延迟一点时间确保页面完全加载
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
+  }, []);
 
   return (
     <div className="min-h-screen">
-      {/* Header with theme and language switchers */}
-      <header className="fixed top-0 right-0 z-50 p-4 flex gap-4 items-center">
-        {!loading && (
-          <>
-            {user ? (
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 text-sm bg-muted/50 px-3 py-1.5 rounded-md border border-border">
-                  <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center">
-                    <User className="h-3 w-3 text-primary" />
-                  </div>
-                  <span className="hidden sm:inline text-muted-foreground">
-                    {user.email}
-                  </span>
-                </div>
-                <button
-                  onClick={() => signOut()}
-                  className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-md border border-border bg-background hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:hover:bg-red-900/10 dark:hover:border-red-800 transition-colors duration-200"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span className="hidden sm:inline">退出</span>
-                </button>
-              </div>
-            ) : (
-              <Link
-                href="/login"
-                className="flex items-center gap-2 text-sm px-4 py-2 rounded-md border border-border bg-background hover:bg-accent text-foreground transition-colors duration-200"
-              >
-                <LogIn className="h-4 w-4" />
-                <span className="hidden sm:inline">登录</span>
-              </Link>
-            )}
-          </>
-        )}
-        <LanguageSwitcher />
-        <ThemeSwitcher />
-      </header>
+      {/* Navigation Bar */}
+      <Navbar />
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -136,9 +114,9 @@ export default function Home() {
         <PricingPlans />
       </section>
 
-      {/* Generation History Section */}
-      <section id="generation-history" className="py-20 px-4">
-        <GenerationHistory />
+      {/* FAQ Section */}
+      <section id="faq" className="py-20 px-4">
+        <FAQ />
       </section>
 
       {/* Footer */}

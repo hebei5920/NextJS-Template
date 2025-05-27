@@ -110,7 +110,6 @@ export function GenerationHistory() {
     return (
       <div className="w-full max-w-4xl mx-auto p-6">
         <div className="flex items-center gap-2 mb-6">
-          <History className="h-6 w-6 text-primary" />
           <h2 className="text-2xl font-bold">生成历史</h2>
         </div>
         
@@ -129,7 +128,6 @@ export function GenerationHistory() {
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
       <div className="flex items-center gap-2 mb-6">
-        <History className="h-6 w-6 text-primary" />
         <h2 className="text-2xl font-bold">生成历史</h2>
         <span className="ml-auto text-sm text-muted-foreground">
           {history.length} 条记录
