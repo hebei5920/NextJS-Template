@@ -41,6 +41,44 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 4. 支付成功后重定向到 `/success`
 5. 支付取消后重定向到 `/canceled`
 
+## 支付结果页面
+
+### 成功页面 (`/success`)
+- 显示支付成功状态
+- 展示订单详情和用户信息
+- 提供快捷导航到主要功能
+- 自动验证支付状态
+- 支持保存支付凭证
+
+### 取消页面 (`/canceled`)
+- 显示支付失败或取消信息
+- 提供问题排查建议
+- 常见问题解答
+- 重试支付和联系客服选项
+- 智能错误原因识别
+
+## API 端点
+
+### 支付相关
+- `POST /api/stripe` - 创建支付会话
+- `GET /api/stripe/verify` - 验证支付状态
+- `POST /api/orders` - Webhook 处理订单
+
+### 验证API使用方法
+```javascript
+// 验证支付状态
+const response = await fetch(`/api/stripe/verify?session_id=${sessionId}`);
+const result = await response.json();
+
+if (result.success && result.data.success) {
+  // 支付成功
+  console.log('Payment verified:', result.data);
+} else {
+  // 支付失败
+  console.log('Payment failed');
+}
+```
+
 ## 价格ID 映射
 
 当前价格ID映射在 `app/api/stripe/route.ts` 中：
@@ -59,10 +97,32 @@ const PRICE_ID_LIST = [
     },
 ]
 ```
+## 支付页面功能
+
+### 成功页面特性
+- ✅ 实时支付状态验证
+- ✅ 用户友好的成功反馈
+- ✅ 订单详情展示
+- ✅ 快捷导航菜单
+- ✅ 支付凭证保存
+- ✅ 自动重定向选项
+
+### 失败页面特性
+- ✅ 智能错误原因识别
+- ✅ 问题解决方案建议
+- ✅ 常见问题解答
+- ✅ 一键重试支付
+- ✅ 客服联系方式
+- ✅ 银行卡问题排查
 
 ## 注意事项
 
 1. 年付模式使用 `subscription` 模式，月付使用 `payment` 模式
 2. 确保在 Stripe 控制台中创建了对应的价格ID
 3. 测试环境和生产环境需要使用不同的密钥
-4. 支付成功后会触发 webhook 来处理订单 
+4. 支付成功后会触发 webhook 来处理订单
+5. 支付页面支持深色模式和响应式设计
+6. 所有支付状态都会进行实时验证
+7. 用户可以在任何时候联系客服获得帮助 
+
+## stripe listen --events checkout.session.completed --forward-to localhost:3000/api/order
