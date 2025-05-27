@@ -46,6 +46,7 @@ model User {
 
   // Relationships
   orders          Order[]
+  voiceModels     VoiceModel[]
 
   @@map("users")
 }
@@ -68,4 +69,24 @@ model Order {
   user          User?    @relation(fields: [userId], references: [supabaseId])
 
   @@map("orders")
+}
+
+model VoiceModel {
+  id            Int      @id @default(autoincrement())
+  modelId   String   @unique @map("model_id") // Speechify返回的语音模型ID
+  userId        String   @map("user_id") // 用户的supabaseId
+  gender        String   // 性别: "male" 或 "female"
+  locale        String?  // 语音的语言/地区
+  displayName   String   @map("display_name") // 显示名称
+  avatarImage   String?  @map("avatar_image") // 头像图片URL
+  
+  // 时间戳
+  createDate    DateTime @default(now()) @map("create_date")
+  updateDate    DateTime @updatedAt @map("update_date")
+  
+  
+  // 关联到用户表
+  user          User?    @relation(fields: [userId], references: [supabaseId])
+
+  @@map("voice_models")
 }

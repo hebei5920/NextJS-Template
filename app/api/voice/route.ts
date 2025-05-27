@@ -1,5 +1,8 @@
 import { createClient } from "@/lib/supabase-server";
 import { NextResponse, NextRequest } from "next/server";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
     try {
@@ -108,22 +111,25 @@ export async function POST(request: NextRequest) {
 
         const speechifyResult = await speechifyResponse.json();
 
-        // 记录语音创建历史
+        // 保存语音模型到数据库
         try {
-            await supabase
-                .from('voice_creations')
-                .insert({
-                    user_id: user.id,
-                    voice_name: name,
-                    gender: gender,
-                    full_name: fullName,
-                    speechify_voice_id: speechifyResult.id,
-                    speechify_response: speechifyResult,
-                    created_at: new Date().toISOString()
-                });
+            const voiceModel = await prisma.voiceModel.create({
+                data: {
+                    modelId: speechifyResult.id,
+                    userId: user.id, // 用户的supabaseId
+                    gender: speechifyResult.gender || gender,
+                    locale: speechifyResult.locale || 'zh-CN',
+                    displayName: speechifyResult.display_name || name,
+                    avatarImage: speechifyResult.avatar_image || null,
+                }
+            });
+
+            console.log('Voice model saved to database:', voiceModel);
         } catch (dbError) {
-            console.error('Failed to save voice creation history:', dbError);
+            console.error('Failed to save voice model to database:', dbError);
+            // 即使数据库保存失败，也返回成功响应，因为语音模型已在Speechify创建成功
         }
+
 
         return NextResponse.json({
             success: true,
@@ -141,6 +147,8 @@ export async function POST(request: NextRequest) {
             },
             { status: 500 }
         );
+    } finally {
+        await prisma.$disconnect();
     }
 }
 
