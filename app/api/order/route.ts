@@ -69,13 +69,11 @@ export async function POST(request: NextRequest) {
       signature,
       process.env.STRIPE_WEBHOOK_KEY || ""
     )
-    console.log("++++++++++++++++1");
 
     if (event.type === "checkout.session.completed") {
       const session = event.data.object
       const line_items = await stripe.checkout.sessions.listLineItems(session.id);
       const promises = line_items.data.map(async (ele) => {
-        console.log("++++++++++++++++2", ele);
         const pId = ele.price?.product as string
         let v = PRODUCT_TOKEN_LIST.find(i => i.key === pId)?.value || 0
 
@@ -91,8 +89,7 @@ export async function POST(request: NextRequest) {
           createDate: new Date(),
           updateDate: new Date()
         })
-        console.log("v", v);
-
+ 
         await UserService.addUserCredits(session.client_reference_id || "", v)
 
       });

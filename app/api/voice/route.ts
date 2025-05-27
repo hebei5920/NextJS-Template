@@ -1,9 +1,107 @@
 import { createClient } from "@/lib/supabase-server";
 import { NextResponse, NextRequest } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { createServerMediaService } from "@/service/media-service";
 
 const prisma = new PrismaClient();
 
+// Speechify TTS API 类型定义
+interface SpeechifyTTSRequest {
+    input: string;
+    voice_id: string;
+    audio_format?: 'wav' | 'mp3' | 'ogg' | 'aac';
+    model?: 'simba-english' | 'simba-multilingual';
+    language?: string;
+    options?: {
+        loudness_normalization?: boolean;
+        text_normalization?: boolean;
+    };
+}
+
+interface SpeechifyTTSResponse {
+    audio_data: string;
+    audio_format: 'wav' | 'mp3' | 'ogg' | 'aac';
+    billable_characters_count: number;
+    speech_marks?: {
+        chunks: any[];
+        end: number;
+        end_time: number;
+        start: number;
+        start_time: number;
+        type: string;
+        value: string;
+    };
+}
+
+// Speechify支持的语言列表
+const SUPPORTED_LANGUAGES = {
+  // 完全支持的语言
+  'en': 'English',
+  'fr-FR': 'French',
+  'de-DE': 'German', 
+  'es-ES': 'Spanish',
+  'pt-BR': 'Portuguese (Brazil)',
+  'pt-PT': 'Portuguese (Portugal)',
+  
+  // Beta语言
+  'ar-AE': 'Arabic',
+  'da-DK': 'Danish',
+  'nl-NL': 'Dutch',
+  'et-EE': 'Estonian',
+  'fi-FI': 'Finnish',
+  'el-GR': 'Greek',
+  'he-IL': 'Hebrew',
+  'hi-IN': 'Hindi',
+  'it-IT': 'Italian',
+  'ja-JP': 'Japanese',
+  'nb-NO': 'Norwegian',
+  'pl-PL': 'Polish',
+  'ru-RU': 'Russian',
+  'sv-SE': 'Swedish',
+  'tr-TR': 'Turkish',
+  'uk-UA': 'Ukrainian',
+  'vi-VN': 'Vietnamese'
+};
+
+// 获取语音模型列表
+export async function GET(request: NextRequest) {
+    try {
+        // 验证用户身份
+        const supabase = createClient();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+            return NextResponse.json(
+                { error: 'Unauthorized - Please log in to access voice models' },
+                { status: 401 }
+            );
+        }
+
+        // 获取用户的语音模型
+        const voiceModels = await prisma.voiceModel.findMany({
+            where: {
+                userId: user.id
+            },
+            orderBy: {
+                createDate: 'desc'
+            }
+        });
+
+        return NextResponse.json({
+            success: true,
+            data: voiceModels || []
+        });
+
+    } catch (error) {
+        console.error('Get voice models error:', error);
+        return NextResponse.json(
+            { error: 'Internal server error' },
+            { status: 500 }
+        );
+    }
+}
+
+// 文本转语音 API
 export async function POST(request: NextRequest) {
     try {
         // 验证用户身份
@@ -17,57 +115,87 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Parse multipart/form-data
-        const formData = await request.formData();
-        const name = formData.get('name') as string;
-        const gender = formData.get('gender') as string;
-        const sample = formData.get('sample') as File;
-        const avatar = formData.get('avatar') as File;
-        const fullName = formData.get('fullName') as string;
+        // 解析请求体
+        const body = await request.json();
+        const { 
+            input, 
+            voice_id, 
+            audio_format = 'wav',
+            model = 'simba-english',
+            language,
+            options = {}
+        } = body;
 
         // 输入验证
-        if (!name || typeof name !== 'string') {
+        if (!input || typeof input !== 'string') {
             return NextResponse.json(
-                { error: 'Name is required and must be a string' },
+                { error: 'Input is required and must be a string' },
                 { status: 400 }
             );
         }
 
-        if (!gender || !['male', 'female'].includes(gender)) {
+        if (input.length < 1) {
             return NextResponse.json(
-                { error: 'Gender is required and must be either "male" or "female"' },
+                { error: 'Input cannot be empty' },
                 { status: 400 }
             );
         }
 
-        if (!sample || !(sample instanceof File)) {
+        if (input.length > 5000) {
             return NextResponse.json(
-                { error: 'Sample file is required' },
+                { error: 'Input cannot exceed 5000 characters' },
                 { status: 400 }
             );
         }
 
-        if (!avatar || !(avatar instanceof File)) {
+        if (!voice_id || typeof voice_id !== 'string') {
             return NextResponse.json(
-                { error: 'Avatar file is required' },
+                { error: 'Voice ID is required' },
                 { status: 400 }
             );
         }
 
-        if (!fullName || typeof fullName !== 'string') {
+        // 验证音频格式
+        const validFormats = ['wav', 'mp3', 'ogg', 'aac'];
+        if (!validFormats.includes(audio_format)) {
             return NextResponse.json(
-                { error: 'Full name is required for consent' },
+                { error: `Invalid audio format. Must be one of: ${validFormats.join(', ')}` },
                 { status: 400 }
             );
         }
 
-        // 构建 consent 对象
-        const consent = JSON.stringify({
-            fullName: fullName,
-            email: user.email || '',
-            timestamp: new Date().toISOString(),
-            agreed: true
-        });
+        // 验证模型
+        const validModels = ['simba-english', 'simba-multilingual'];
+        if (!validModels.includes(model)) {
+            return NextResponse.json(
+                { error: `Invalid model. Must be one of: ${validModels.join(', ')}` },
+                { status: 400 }
+            );
+        }
+
+        // 验证语言参数（可选）
+        if (language && !SUPPORTED_LANGUAGES[language as keyof typeof SUPPORTED_LANGUAGES]) {
+            return NextResponse.json(
+                { error: `Unsupported language. Supported languages: ${Object.keys(SUPPORTED_LANGUAGES).join(', ')}` },
+                { status: 400 }
+            );
+        }
+
+        // 验证选项
+        const { loudness_normalization, text_normalization } = options;
+        if (loudness_normalization !== undefined && typeof loudness_normalization !== 'boolean') {
+            return NextResponse.json(
+                { error: 'loudness_normalization must be a boolean value' },
+                { status: 400 }
+            );
+        }
+
+        if (text_normalization !== undefined && typeof text_normalization !== 'boolean') {
+            return NextResponse.json(
+                { error: 'text_normalization must be a boolean value' },
+                { status: 400 }
+            );
+        }
 
         // 检查环境变量
         const speechifyToken = process.env.SPEECHIFY_KEY;
@@ -78,140 +206,131 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 准备发送到 Speechify API 的表单数据
-        const speechifyFormData = new FormData();
-        speechifyFormData.append('name', name);
-        speechifyFormData.append('gender', gender);
-        speechifyFormData.append('sample', sample);
-        speechifyFormData.append('avatar', avatar);
-        speechifyFormData.append('consent', consent);
+        // 构建 Speechify API 请求
+        const speechifyRequest: SpeechifyTTSRequest = {
+            input,
+            voice_id,
+            audio_format,
+            model
+        };
 
-        // 调用 Speechify API
-        const speechifyResponse = await fetch('https://api.sws.speechify.com/v1/voices', {
+        // 添加语言参数（如果提供）
+        if (language) {
+            speechifyRequest.language = language;
+        }
+
+        // 添加可选参数
+        if (Object.keys(options).length > 0) {
+            speechifyRequest.options = {};
+            
+            if (loudness_normalization !== undefined) {
+                speechifyRequest.options.loudness_normalization = loudness_normalization;
+            }
+            
+            if (text_normalization !== undefined) {
+                speechifyRequest.options.text_normalization = text_normalization;
+            }
+        }
+
+        console.log('Speechify TTS API Request:', speechifyRequest);
+
+        const speechifyResponse = await fetch('https://api.sws.speechify.com/v1/audio/speech', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${speechifyToken}`,
+                'Content-Type': 'application/json'
             },
-            body: speechifyFormData
+            body: JSON.stringify(speechifyRequest)
         });
-
-        console.log("speechifyResponse", speechifyResponse);
 
         if (!speechifyResponse.ok) {
             const errorText = await speechifyResponse.text();
-            console.error('Speechify API error:', errorText);
+            console.error('TTS API error:', errorText);
+            
+            // 尝试解析错误响应
+            let errorDetails;
+            try {
+                errorDetails = JSON.parse(errorText);
+            } catch {
+                errorDetails = { message: errorText };
+            }
+
             return NextResponse.json(
-                {
-                    error: 'Failed to create voice with Speechify API',
-                    details: process.env.NODE_ENV === 'development' ? errorText : undefined
+                { 
+                    error: 'Failed to generate speech',
+                    details: process.env.NODE_ENV === 'development' ? errorDetails : undefined,
+                    statusCode: speechifyResponse.status
                 },
                 { status: speechifyResponse.status }
             );
         }
 
-        const speechifyResult = await speechifyResponse.json();
+        // 解析 Speechify 响应
+        const speechifyResult: SpeechifyTTSResponse = await speechifyResponse.json();
+        
+        // 将 Base64 音频数据转换为 Buffer
+        const audioBuffer = Buffer.from(speechifyResult.audio_data, 'base64');
+        
+        // 创建 File 对象用于 media-service（Node.js 环境兼容）
+        const fileName = `tts-${Date.now()}.${speechifyResult.audio_format}`;
+        const audioFile = new File(
+            [audioBuffer], 
+            fileName,
+            { type: `audio/${speechifyResult.audio_format}` }
+        );
 
-        // 保存语音模型到数据库
-        try {
-            const voiceModel = await prisma.voiceModel.create({
-                data: {
-                    modelId: speechifyResult.id,
-                    userId: user.id, // 用户的supabaseId
-                    gender: speechifyResult.gender || gender,
-                    locale: speechifyResult.locale || 'zh-CN',
-                    displayName: speechifyResult.display_name || name,
-                    avatarImage: speechifyResult.avatar_image || null,
-                }
-            });
+        // 使用 media-service 上传音频文件
+        const mediaService = createServerMediaService();
+        const uploadResult = await mediaService.uploadAudio({
+            file: audioFile,
+            userId: user.id,
+            bucket: 'media'
+        });
 
-            console.log('Voice model saved to database:', voiceModel);
-        } catch (dbError) {
-            console.error('Failed to save voice model to database:', dbError);
-            // 即使数据库保存失败，也返回成功响应，因为语音模型已在Speechify创建成功
-        }
-
+        // 保存语音记录到数据库
+        const voiceRecord = await prisma.voice.create({
+            data: {
+                vmId: voice_id,
+                userId: user.id,
+                speechMarks: speechifyResult.speech_marks || undefined,
+                billableCharactersCount: speechifyResult.billable_characters_count,
+                audioFormat: speechifyResult.audio_format,
+                audioUrl: uploadResult.url,
+                inputText: input,
+                model: model,
+                options: options
+            }
+        });
 
         return NextResponse.json({
             success: true,
-            message: 'Voice created successfully',
-            data: speechifyResult
+            message: 'Speech generated successfully',
+            data: {
+                id: voiceRecord.id,
+                input: input,
+                audioUrl: uploadResult.url,
+                voiceId: voice_id,
+                voiceModelId: voice_id,
+                audioFormat: speechifyResult.audio_format,
+                billableCharacters: speechifyResult.billable_characters_count,
+                model: model,
+                options: options,
+                speechMarks: speechifyResult.speech_marks,
+                generatedAt: voiceRecord.createdAt.toISOString()
+            }
         });
 
     } catch (error) {
-        console.error('Voice creation error:', error);
+        console.error('Text-to-speech error:', error);
 
         return NextResponse.json(
             {
-                error: 'Internal server error occurred during voice creation',
+                error: 'Internal server error occurred during speech generation',
                 details: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.message : String(error)) : undefined
             },
             { status: 500 }
         );
     } finally {
         await prisma.$disconnect();
-    }
-}
-
-export async function GET(request: NextRequest) {
-    try {
-        // 验证用户身份
-        const supabase = createClient();
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-        if (authError || !user) {
-            return NextResponse.json(
-                { error: 'Unauthorized - Please log in to use this service' },
-                { status: 401 }
-            );
-        }
-
-        // 检查环境变量
-        const speechifyToken = process.env.SPEECHIFY_KEY;
-        if (!speechifyToken) {
-            return NextResponse.json(
-                { error: 'Speechify API token not configured' },
-                { status: 500 }
-            );
-        }
-
-        // 获取用户的语音列表
-        const speechifyResponse = await fetch('https://api.sws.speechify.com/v1/voices', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${speechifyToken}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!speechifyResponse.ok) {
-            const errorText = await speechifyResponse.text();
-            console.error('Speechify API error:', errorText);
-            return NextResponse.json(
-                {
-                    error: 'Failed to fetch voices from Speechify API',
-                    details: process.env.NODE_ENV === 'development' ? errorText : undefined
-                },
-                { status: speechifyResponse.status }
-            );
-        }
-
-        const voices = await speechifyResponse.json();
-
-        return NextResponse.json({
-            success: true,
-            message: 'Voices fetched successfully',
-            data: voices
-        });
-
-    } catch (error) {
-        console.error('Voice fetch error:', error);
-
-        return NextResponse.json(
-            {
-                error: 'Internal server error occurred while fetching voices',
-                details: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.message : String(error)) : undefined
-            },
-            { status: 500 }
-        );
     }
 }

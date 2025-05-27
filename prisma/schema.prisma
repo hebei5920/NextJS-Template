@@ -47,6 +47,7 @@ model User {
   // Relationships
   orders          Order[]
   voiceModels     VoiceModel[]
+  voices          Voice[]
 
   @@map("users")
 }
@@ -73,7 +74,7 @@ model Order {
 
 model VoiceModel {
   id            Int      @id @default(autoincrement())
-  modelId   String   @unique @map("model_id") // Speechify返回的语音模型ID
+  modelId       String   @unique @map("model_id") // Speechify返回的语音模型ID
   userId        String   @map("user_id") // 用户的supabaseId
   gender        String   // 性别: "male" 或 "female"
   locale        String?  // 语音的语言/地区
@@ -87,6 +88,30 @@ model VoiceModel {
   
   // 关联到用户表
   user          User?    @relation(fields: [userId], references: [supabaseId])
+  voices        Voice[]
 
   @@map("voice_models")
+}
+
+model Voice {
+  id                        Int      @id @default(autoincrement())
+  vmId                      String   @map("vm_id") // VoiceModel的id
+  userId                    String   @map("user_id") // 用户的supabaseId
+  speechMarks               Json?    @map("speech_marks") // 语音标记数据，用于注释音频数据的元信息
+  billableCharactersCount   Int      @map("billable_characters_count") // 可计费字符长度
+  audioFormat               String   @map("audio_format") // 输出音频格式: wav, mp3, ogg, aac
+  audioUrl                  String   @map("audio_url") // 转换后的音频地址（存储服务返回的URL）
+  inputText                 String   @map("input_text") // 输入的文本内容
+  model                     String   // 使用的模型: simba-english, simba-multilingual
+  options                   Json?    // TTS选项配置
+  
+  // 时间戳
+  createdAt                 DateTime @default(now()) @map("created_at")
+  updatedAt                 DateTime @updatedAt @map("updated_at")
+  
+  // 关联关系
+  user                      User?        @relation(fields: [userId], references: [supabaseId])
+  voiceModel                VoiceModel   @relation(fields: [vmId], references: [modelId])
+
+  @@map("voices")
 }

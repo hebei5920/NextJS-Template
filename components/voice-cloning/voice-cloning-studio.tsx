@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Mic, Upload, Type, Sparkles, ArrowRight, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Mic, Upload, Type, Sparkles, ArrowRight, User, Globe } from 'lucide-react';
 import { AudioRecorder } from './audio-recorder';
 import { FileUploader } from './file-uploader';
 import { TextToSpeech } from './text-to-speech';
@@ -10,6 +10,36 @@ import { createClient } from '@/lib/supabase-client';
 
 type Step = 'input' | 'consent' | 'generate';
 type InputMethod = 'record' | 'upload';
+
+// Speechify支持的语言列表
+const SUPPORTED_LANGUAGES = {
+  // 完全支持的语言
+  'en': 'English',
+  'fr-FR': 'French',
+  'de-DE': 'German', 
+  'es-ES': 'Spanish',
+  'pt-BR': 'Portuguese (Brazil)',
+  'pt-PT': 'Portuguese (Portugal)',
+  
+  // Beta语言
+  'ar-AE': 'Arabic',
+  'da-DK': 'Danish',
+  'nl-NL': 'Dutch',
+  'et-EE': 'Estonian',
+  'fi-FI': 'Finnish',
+  'el-GR': 'Greek',
+  'he-IL': 'Hebrew',
+  'hi-IN': 'Hindi',
+  'it-IT': 'Italian',
+  'ja-JP': 'Japanese',
+  'nb-NO': 'Norwegian',
+  'pl-PL': 'Polish',
+  'ru-RU': 'Russian',
+  'sv-SE': 'Swedish',
+  'tr-TR': 'Turkish',
+  'uk-UA': 'Ukrainian',
+  'vi-VN': 'Vietnamese'
+};
 
 export function VoiceCloningStudio() {
   const { t } = useTranslation();
@@ -21,16 +51,73 @@ export function VoiceCloningStudio() {
     method: InputMethod;
   } | null>(null);
   const [userInfo, setUserInfo] = useState<{
-    fullName: string;
+    name: string;
     gender: 'male' | 'female';
-    voiceName: string;
+    language: string;
   }>({
-    fullName: '',
+    name: '',
     gender: 'male',
-    voiceName: ''
+    language: 'en'
   });
+  const [userFullName, setUserFullName] = useState<string>('');
   const [isCreatingVoice, setIsCreatingVoice] = useState(false);
   const [voiceCreated, setVoiceCreated] = useState<any>(null);
+
+  // 获取用户信息
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          let fullName = '';
+          
+          // 尝试从用户元数据获取姓名
+          if (user.user_metadata?.full_name) {
+            fullName = user.user_metadata.full_name;
+          } else if (user.user_metadata?.name) {
+            fullName = user.user_metadata.name;
+          } else {
+            // 从profiles表获取用户信息
+            try {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('full_name, first_name, last_name')
+                .eq('id', user.id)
+                .single();
+
+              if (profile?.full_name) {
+                fullName = profile.full_name;
+              } else if (profile?.first_name && profile?.last_name) {
+                fullName = `${profile.first_name} ${profile.last_name}`;
+              } else if (profile?.first_name) {
+                fullName = profile.first_name;
+              }
+            } catch (error) {
+              console.warn('Failed to fetch user profile:', error);
+            }
+          }
+
+          // 如果仍然没有获取到姓名，使用邮箱前缀作为默认值
+          if (!fullName && user.email) {
+            fullName = user.email.split('@')[0];
+          }
+
+          setUserFullName(fullName || 'Unknown User');
+          
+          // 设置默认的模型名称
+          if (!userInfo.name && fullName) {
+            setUserInfo(prev => ({ ...prev, name: `${fullName}的语音模型` }));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
 
   // 处理录音完成
   const handleRecordingComplete = (audioBlob: Blob, audioUrl: string) => {
@@ -59,7 +146,7 @@ export function VoiceCloningStudio() {
 
   // 创建语音模型
   const createVoiceModel = async () => {
-    if (!voiceData || !userInfo.fullName) {
+    if (!voiceData || !userInfo.name) {
       return;
     }
 
@@ -67,10 +154,10 @@ export function VoiceCloningStudio() {
 
     try {
       const formData = new FormData();
-      formData.append('name', userInfo.fullName);
+      formData.append('name', userInfo.name);
       formData.append('gender', userInfo.gender);
+      formData.append('language', userInfo.language);
       formData.append('sample', voiceData.blob!);
-      formData.append('fullName', userInfo.fullName);
 
       // 获取用户头像
       await fetchAndAppendUserAvatar(formData);
@@ -87,7 +174,7 @@ export function VoiceCloningStudio() {
       // 从 Supabase 获取用户信息
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       let avatarBlob: Blob | null = null;
 
       if (user?.user_metadata?.user_metadata) {
@@ -150,7 +237,7 @@ export function VoiceCloningStudio() {
 
       // 添加头像到表单数据
       formData.append('avatar', avatarBlob, 'avatar.jpg');
-      
+
       // 发送请求到API
       await submitVoiceCreation(formData);
 
@@ -170,25 +257,25 @@ export function VoiceCloningStudio() {
       canvas.width = 200;
       canvas.height = 200;
       const ctx = canvas.getContext('2d');
-      
+
       if (ctx) {
         // 创建一个简单的默认头像（圆形背景 + 用户名首字母）
         const gradient = ctx.createLinearGradient(0, 0, 200, 200);
         gradient.addColorStop(0, '#3b82f6');
         gradient.addColorStop(1, '#1d4ed8');
-        
+
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, 200, 200);
-        
+
         // 添加用户名首字母
         ctx.fillStyle = 'white';
         ctx.font = 'bold 80px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        const initial = userInfo.fullName.charAt(0).toUpperCase() || 'U';
+        const initial = userInfo.name.charAt(0).toUpperCase() || 'U';
         ctx.fillText(initial, 100, 100);
       }
-      
+
       canvas.toBlob((blob) => {
         resolve(blob || new Blob());
       }, 'image/png');
@@ -196,8 +283,9 @@ export function VoiceCloningStudio() {
   };
 
   const submitVoiceCreation = async (formData: FormData) => {
+ 
     try {
-      const response = await fetch('/api/voice', {
+      const response = await fetch('/api/voice/model', {
         method: 'POST',
         body: formData
       });
@@ -224,9 +312,9 @@ export function VoiceCloningStudio() {
     setVoiceData(null);
     setInputMethod('record');
     setUserInfo({
-      fullName: '',
+      name: '',
       gender: 'male',
-      voiceName: ''
+      language: 'en'
     });
     setVoiceCreated(null);
   };
@@ -243,10 +331,10 @@ export function VoiceCloningStudio() {
       <div className="flex items-center justify-center mb-12">
         <div className="flex items-center gap-4">
           <div className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${currentStep === 'input'
-              ? 'bg-primary text-primary-foreground'
-              : voiceData
-                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                : 'bg-muted text-muted-foreground'
+            ? 'bg-primary text-primary-foreground'
+            : voiceData
+              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+              : 'bg-muted text-muted-foreground'
             }`}>
             <div className="w-6 h-6 rounded-full bg-current/20 flex items-center justify-center text-sm font-bold">
               1
@@ -257,10 +345,10 @@ export function VoiceCloningStudio() {
           <ArrowRight className="h-5 w-5 text-muted-foreground" />
 
           <div className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${currentStep === 'consent'
-              ? 'bg-primary text-primary-foreground'
-              : voiceCreated
-                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                : 'bg-muted text-muted-foreground'
+            ? 'bg-primary text-primary-foreground'
+            : voiceCreated
+              ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+              : 'bg-muted text-muted-foreground'
             }`}>
             <div className="w-6 h-6 rounded-full bg-current/20 flex items-center justify-center text-sm font-bold">
               2
@@ -271,8 +359,8 @@ export function VoiceCloningStudio() {
           <ArrowRight className="h-5 w-5 text-muted-foreground" />
 
           <div className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${currentStep === 'generate'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-muted text-muted-foreground'
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-muted text-muted-foreground'
             }`}>
             <div className="w-6 h-6 rounded-full bg-current/20 flex items-center justify-center text-sm font-bold">
               3
@@ -302,8 +390,8 @@ export function VoiceCloningStudio() {
               <button
                 onClick={() => setInputMethod('record')}
                 className={`px-6 py-3 rounded-md font-medium transition-all flex items-center gap-2 ${inputMethod === 'record'
-                    ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
                 <Mic className="h-4 w-4" />
@@ -312,8 +400,8 @@ export function VoiceCloningStudio() {
               <button
                 onClick={() => setInputMethod('upload')}
                 className={`px-6 py-3 rounded-md font-medium transition-all flex items-center gap-2 ${inputMethod === 'upload'
-                    ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
                 <Upload className="h-4 w-4" />
@@ -421,22 +509,83 @@ export function VoiceCloningStudio() {
 
           {/* 信息表单 */}
           <div className="glass-card rounded-2xl p-8 space-y-6">
+            {/* 用户信息显示 */}
+            {userFullName && (
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  用户信息
+                </h4>
+                <p className="text-blue-800 dark:text-blue-200 text-sm">
+                  授权用户：{userFullName}
+                </p>
+                <p className="text-blue-600 dark:text-blue-300 text-xs mt-1">
+                  此信息将用于语音模型的授权记录
+                </p>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* 姓名输入 */}
+              {/* 模型名称输入 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">
                   模型名称 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  value={userInfo.fullName}
-                  onChange={(e) => setUserInfo(prev => ({ ...prev, fullName: e.target.value }))}
+                  value={userInfo.name}
+                  onChange={(e) => setUserInfo(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="请输入模型名称"
                   className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                 />
+                <p className="text-xs text-muted-foreground">
+                  为您的语音模型起一个容易识别的名称
+                </p>
               </div>
 
-
+              {/* 语言选择 */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Globe className="h-4 w-4" />
+                  语言
+                </label>
+                <select
+                  value={userInfo.language}
+                  onChange={(e) => setUserInfo(prev => ({ ...prev, language: e.target.value }))}
+                  className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                >
+                  <optgroup label="完全支持">
+                    <option value="en">English</option>
+                    <option value="fr-FR">French</option>
+                    <option value="de-DE">German</option>
+                    <option value="es-ES">Spanish</option>
+                    <option value="pt-BR">Portuguese (Brazil)</option>
+                    <option value="pt-PT">Portuguese (Portugal)</option>
+                  </optgroup>
+                  <optgroup label="Beta版本">
+                    <option value="ar-AE">Arabic</option>
+                    <option value="da-DK">Danish</option>
+                    <option value="nl-NL">Dutch</option>
+                    <option value="et-EE">Estonian</option>
+                    <option value="fi-FI">Finnish</option>
+                    <option value="el-GR">Greek</option>
+                    <option value="he-IL">Hebrew</option>
+                    <option value="hi-IN">Hindi</option>
+                    <option value="it-IT">Italian</option>
+                    <option value="ja-JP">Japanese</option>
+                    <option value="nb-NO">Norwegian</option>
+                    <option value="pl-PL">Polish</option>
+                    <option value="ru-RU">Russian</option>
+                    <option value="sv-SE">Swedish</option>
+                    <option value="tr-TR">Turkish</option>
+                    <option value="uk-UA">Ukrainian</option>
+                    <option value="vi-VN">Vietnamese</option>
+                  </optgroup>
+                </select>
+                <p className="text-xs text-muted-foreground">
+                  选择语音模型的主要语言，支持跨语言合成
+                </p>
+              </div>
             </div>
 
             {/* 性别选择 */}
@@ -476,7 +625,8 @@ export function VoiceCloningStudio() {
                 1. 我拥有所提供音频的合法权利<br />
                 2. 同意将此音频用于语音模型训练<br />
                 3. 理解生成的语音模型可能被用于文本转语音服务<br />
-                4. 我的姓名和邮箱将作为授权记录保存
+                4. 我的姓名和邮箱将作为授权记录保存<br />
+                5. 语音克隆技术支持跨语言合成，无语言限制
               </p>
             </div>
 
@@ -484,7 +634,7 @@ export function VoiceCloningStudio() {
             <div className="flex justify-center pt-4">
               <button
                 onClick={createVoiceModel}
-                disabled={!userInfo.fullName || isCreatingVoice}
+                disabled={!userInfo.name || isCreatingVoice}
                 className="btn-primary flex items-center gap-2 text-lg px-8 py-4 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isCreatingVoice ? (
@@ -524,7 +674,7 @@ export function VoiceCloningStudio() {
                 <Sparkles className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <div className="font-medium">{userInfo.voiceName}</div>
+                <div className="font-medium">{userInfo.name}</div>
                 <div className="text-sm text-muted-foreground">
                   语音模型ID: {voiceCreated.id}
                 </div>
