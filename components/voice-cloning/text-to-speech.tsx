@@ -5,11 +5,11 @@ import { Volume2, Play, Pause, Download, Loader2, Type } from 'lucide-react';
 import { useTranslation } from '@/providers/language-provider';
 
 interface TextToSpeechProps {
-  voiceUrl?: string; // 用户上传的音色文件URL
+  voiceModel?: any; // Speechify语音模型对象
   onGenerate?: (text: string, audioUrl: string) => void;
 }
 
-export function TextToSpeech({ voiceUrl, onGenerate }: TextToSpeechProps) {
+export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
   const { t } = useTranslation();
   const [text, setText] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -35,8 +35,8 @@ export function TextToSpeech({ voiceUrl, onGenerate }: TextToSpeechProps) {
       return;
     }
 
-    if (!voiceUrl) {
-      setError('请先录制或上传音色文件');
+    if (!voiceModel?.id) {
+      setError('语音模型未就绪，请重新创建');
       return;
     }
 
@@ -56,15 +56,19 @@ export function TextToSpeech({ voiceUrl, onGenerate }: TextToSpeechProps) {
         });
       }, 200);
 
-      // 调用语音生成API
-      const response = await fetch('/api/generation', {
+      // 调用Speechify文本转语音API
+      const speechifyToken = process.env.SPEECHIFY_KEY;
+      
+      // 由于浏览器环境无法直接调用Speechify API（需要服务器端），
+      // 这里我们需要通过自己的API端点来代理请求
+      const response = await fetch('/api/text-to-speech', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           text,
-          voiceUrl,
+          voiceId: voiceModel.id,
         }),
       });
 
@@ -79,16 +83,15 @@ export function TextToSpeech({ voiceUrl, onGenerate }: TextToSpeechProps) {
       const result = await response.json();
 
       if (result.success) {
-        // 如果API返回了真实的音频URL，使用它；否则生成模拟音频
-        let audioUrl = result.data?.audioUrl;
+        // 使用返回的音频URL
+        const audioUrl = result.data?.audioUrl;
         
-        if (!audioUrl || audioUrl.startsWith('data:audio/wav;base64,')) {
-          // 如果是模拟数据或空数据，使用Web Speech API生成演示音频
-          audioUrl = await generateMockAudio(text);
+        if (audioUrl) {
+          setGeneratedAudioUrl(audioUrl);
+          onGenerate?.(text, audioUrl);
+        } else {
+          throw new Error('未返回有效的音频URL');
         }
-        
-        setGeneratedAudioUrl(audioUrl);
-        onGenerate?.(text, audioUrl);
       } else {
         throw new Error(result.message || '语音生成失败');
       }
@@ -214,8 +217,8 @@ export function TextToSpeech({ voiceUrl, onGenerate }: TextToSpeechProps) {
         
         <div className="flex justify-between items-center text-sm text-muted-foreground">
           <span>{text.length}/500 字符</span>
-          {!voiceUrl && (
-            <span className="text-amber-600">⚠️ 请先录制或上传音色文件</span>
+          {!voiceModel && (
+            <span className="text-amber-600">⚠️ 请先创建语音模型</span>
           )}
         </div>
       </div>
@@ -240,7 +243,7 @@ export function TextToSpeech({ voiceUrl, onGenerate }: TextToSpeechProps) {
       <div className="flex justify-center">
         <button
           onClick={generateSpeech}
-          disabled={isGenerating || !text.trim() || !voiceUrl}
+          disabled={isGenerating || !text.trim() || !voiceModel}
           className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-[200px] justify-center"
         >
           {isGenerating ? (

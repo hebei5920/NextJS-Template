@@ -280,14 +280,6 @@ export function FileUploader({
               {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
               {isPlaying ? '暂停' : '播放'}
             </button>
-            
-            <button
-              onClick={() => onFileUpload(uploadedFile, audioUrl!)}
-              className="btn-primary flex items-center gap-2 flex-1"
-            >
-              <Upload className="h-4 w-4" />
-              使用此文件
-            </button>
           </div>
         </div>
       )}

@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
                 { status: 401 }
             );
         }
-        
+
         // Parse and validate request body
         const body = await request.json();
         const { text, voiceUrl } = body;
@@ -66,7 +66,6 @@ export async function POST(request: NextRequest) {
                 });
         } catch (dbError) {
             console.error('Failed to save generation history:', dbError);
-            // 不阻断主流程，只记录错误
         }
 
         return NextResponse.json({
@@ -82,9 +81,9 @@ export async function POST(request: NextRequest) {
 
     } catch (error) {
         console.error('Voice generation error:', error);
-        
+
         return NextResponse.json(
-            { 
+            {
                 error: 'Internal server error occurred during voice generation',
                 details: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.message : String(error)) : undefined
             },
