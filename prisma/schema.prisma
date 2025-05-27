@@ -36,7 +36,7 @@ model User {
   isActive        Boolean  @default(true) @map("is_active")
   
   // Payment and subscription
-  credits         Int      @default(0) // 用户余额/积分
+  credits         Float    @default(0) // 用户余额/积分
   plan            String   @default("free") // 用户套餐: "free", "basic", "pro", "enterprise"
   
   // Timestamps
