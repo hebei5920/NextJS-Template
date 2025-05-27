@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Check, Star, Zap, Crown, Sparkles } from 'lucide-react';
 import { useTranslation } from '@/providers/language-provider';
+import { useAuth } from '@/hooks/useAuth';
+import getStripe from '@/lib/stripe';
 
 interface PricingPlan {
   id: string;
@@ -90,11 +93,99 @@ const pricingPlans: PricingPlan[] = [
 
 export function PricingPlans() {
   const { t } = useTranslation();
+  const router = useRouter();
+  const { user, loading } = useAuth();
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 
-  const handleSubscribe = (planId: string) => {
-    // TODO: 集成支付系统
-    console.log(`Subscribe to plan: ${planId}`);
+  const isAuthenticated = !!user && !loading;
+
+  // 简单的toast通知函数
+  const showToast = (title: string, description: string, variant: 'default' | 'destructive' = 'default') => {
+    // 使用浏览器原生通知或者简单的alert
+    if (variant === 'destructive') {
+      alert(`错误: ${title}\n${description}`);
+    } else {
+      alert(`${title}\n${description}`);
+    }
+  };
+
+  // 处理套餐订阅
+  const handleSubscription = async (type: string) => {
+    if (!isAuthenticated) {
+      showToast(
+        '需要登录',
+        '请先登录账户以继续订阅',
+        'destructive'
+      );
+      router.push('/auth/login');
+      return;
+    }
+
+    let userId = user?.id;
+    if (!userId) {
+      // 额外检查，确保用户ID存在
+      router.push('/api/auth/signin');
+      return;
+    }
+
+    if (type === 'free') {
+      showToast(
+        '免费用户',
+        '您已经是免费用户，可以开始使用基础功能'
+      );
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setSelectedPlan(type);
+
+      const stripe = await getStripe();
+      const response = await fetch("/api/stripe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ 
+          userId, 
+          type,
+          billingCycle 
+        })
+      });
+
+      if (response.status === 500) {
+        showToast(
+          '服务器错误',
+          '支付服务暂时不可用，请稍后重试',
+          'destructive'
+        );
+        return;
+      }
+
+      const data = await response.json();
+      const result = await stripe?.redirectToCheckout({ sessionId: data.id });
+
+      if (result?.error) {
+        console.log(result.error.message);
+        showToast(
+          '支付错误',
+          result.error.message || '跳转到支付页面时出错',
+          'destructive'
+        );
+      }
+    } catch (error) {
+      console.error('订阅错误:', error);
+      showToast(
+        '订阅失败',
+        '处理订阅请求时出错，请稍后重试',
+        'destructive'
+      );
+    } finally {
+      setIsLoading(false);
+      setSelectedPlan(null);
+    }
   };
 
   const formatPrice = (price: number) => {
@@ -231,14 +322,26 @@ export function PricingPlans() {
               {/* 订阅按钮 - 固定在底部 */}
               <div className="mt-auto">
                 <button
-                  onClick={() => handleSubscribe(plan.id)}
-                  className={`w-full py-3 px-6 rounded-lg font-medium transition-all duration-200 ${
+                  onClick={() => handleSubscription(plan.id)}
+                  disabled={isLoading || loading}
+                  className={`w-full py-3 px-6 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
                     plan.popular
                       ? 'btn-primary'
                       : 'btn-secondary hover:bg-primary hover:text-primary-foreground'
                   }`}
                 >
-                  {plan.id === 'free' ? '开始免费使用' : '立即订阅'}
+                  {isLoading && selectedPlan === plan.id ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                      处理中...
+                    </>
+                  ) : loading ? (
+                    '加载中...'
+                  ) : !isAuthenticated ? (
+                    plan.id === 'free' ? '开始免费使用' : '登录后订阅'
+                  ) : (
+                    plan.id === 'free' ? '开始免费使用' : '立即订阅'
+                  )}
                 </button>
               </div>
             </div>

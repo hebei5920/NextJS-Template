@@ -4,19 +4,33 @@ import { NextResponse, NextRequest } from 'next/server';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "")
 
 const PRICE_ID_LIST = [
-    { key: 'basic', value: 'price_1RQMR0Psq011JgrIqqzrzjPR' },
-    { key: 'pro', value: 'price_1RQMRLPsq011JgrImNCwJTre' },
+    { 
+        key: 'pro', 
+        monthly: 'price_1RQMR0Psq011JgrIqqzrzjPR',
+        yearly: 'price_1RQMR0Psq011JgrIqqzrzjPR_yearly' // 需要在Stripe控制台创建年付价格
+    },
+    { 
+        key: 'enterprise', 
+        monthly: 'price_1RQMRLPsq011JgrImNCwJTre',
+        yearly: 'price_1RQMRLPsq011JgrImNCwJTre_yearly' // 需要在Stripe控制台创建年付价格
+    },
 ]
 
 export const POST = async (req: NextRequest, res: NextResponse) => {
     if (req.method === "POST") {
         try {
-            const { userId, type } = await req.json()
+            const { userId, type, billingCycle = 'monthly' } = await req.json()
 
-            let price_id = PRICE_ID_LIST.find(i => i.key === type)?.value
+            const planConfig = PRICE_ID_LIST.find(i => i.key === type);
+            if (!planConfig) {
+                return NextResponse.json({ message: "Invalid plan type" }, { status: 400 });
+            }
+
+            const price_id = billingCycle === 'yearly' ? planConfig.yearly : planConfig.monthly;
+            
             const params = {
                 submit_type: 'pay',
-                mode: 'payment',
+                mode: billingCycle === 'yearly' ? 'subscription' : 'payment',
                 payment_method_types: ['card'],
                 client_reference_id: userId,
                 line_items: [
@@ -33,6 +47,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 
             return NextResponse.json(session, { status: 200 });
         } catch (err) {
+            console.error('Stripe checkout error:', err);
             return NextResponse.json({ message: "Failed to checkout" }, { status: 500 });
 
         }
