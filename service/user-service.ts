@@ -258,4 +258,37 @@ export class UserService {
       throw error;
     }
   }
+
+  /**
+   * 更新用户套餐计划
+   */
+  static async updateUserPlan(userId: number, plan: string): Promise<any> {
+    try {
+      // 验证套餐类型
+      const validPlans = ['free', 'basic', 'pro', 'enterprise'];
+      if (!plan || !validPlans.includes(plan)) {
+        throw new Error(`无效的套餐类型。必须是以下之一: ${validPlans.join(', ')}`);
+      }
+
+      // 先检查用户是否存在
+      const existingUser = await this.getUserById(userId);
+      if (!existingUser) {
+        throw new Error('用户不存在');
+      }
+
+      // 更新用户套餐
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: {
+          plan,
+          updatedAt: new Date()
+        }
+      });
+
+      return updatedUser;
+    } catch (error) {
+      console.error('Error updating user plan:', error);
+      throw error;
+    }
+  }
 } 

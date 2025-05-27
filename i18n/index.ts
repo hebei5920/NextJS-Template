@@ -89,7 +89,7 @@ export function detectBrowserLanguage(): SupportedLanguage {
   return translations[browserLang] ? browserLang : defaultLanguage;
 }
 
-// 本地存储键名
+//TODO 本地存储键名
 export const LANGUAGE_STORAGE_KEY = 'nexusai-language';
 
 // 保存语言设置到本地存储

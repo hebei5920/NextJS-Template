@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
-import type { User } from '@supabase/supabase-js'
+import type { User, AuthError } from '@supabase/supabase-js'
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
@@ -27,9 +27,23 @@ export function useAuth() {
     return () => subscription.unsubscribe()
   }, [supabase.auth])
 
+  // 社交登录
+  const signInWithProvider = async (provider: 'google' | 'github') => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/api/auth/callback`
+      }
+    })
+    
+    if (error) throw error
+    return data
+  }
+
   return {
     user,
     loading,
+    signInWithProvider,
     signOut: () => supabase.auth.signOut(),
   }
 } 

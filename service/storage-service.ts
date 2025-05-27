@@ -57,14 +57,14 @@ export const SUPPORTED_VIDEO_TYPES = [
   'video/quicktime',
   'video/x-msvideo'
 ]
-
+// wav、mp3、ogg、aac
 export const SUPPORTED_AUDIO_TYPES = [
-  'audio/mpeg',
+  // 'audio/mpeg',
   'audio/wav',
   'audio/ogg',
   'audio/aac',
   'audio/mp3',
-  'audio/webm'
+  // 'audio/webm'
 ]
 
 export const ALL_SUPPORTED_TYPES = [
