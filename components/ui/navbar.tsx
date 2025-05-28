@@ -4,12 +4,14 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeSwitcher } from './theme-switcher';
 import { LanguageSwitcher } from './language-switcher';
-import { Sparkles, User, LogIn, LogOut, History } from 'lucide-react';
+import { Sparkles, User, LogIn, LogOut, History, Mic } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { useVoiceModel } from '@/providers/voice-model-provider';
 
 export function Navbar() {
   const { user, loading, signOut } = useAuth();
+  const { selectedVoiceModel, clearSelectedVoiceModel } = useVoiceModel();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
@@ -60,28 +62,34 @@ export function Navbar() {
           </div>
 
           {/* Center - Navigation Menu */}
-          <div className="hidden md:flex items-center justify-center space-x-8 flex-1 max-w-md">
+          <div className="hidden md:flex items-center justify-center space-x-6 flex-1 max-w-lg">
             <button
               onClick={() => scrollToSection('studio')}
-              className="text-foreground hover:text-primary   font-medium"
+              className="text-foreground hover:text-primary font-medium"
             >
-              复刻
+              克隆
             </button>
             <button
               onClick={() => scrollToSection('pricing')}
-              className="text-foreground hover:text-primary   font-medium"
+              className="text-foreground hover:text-primary font-medium"
             >
               定价
             </button>
             <button
               onClick={() => scrollToSection('faq')}
-              className="text-foreground hover:text-primary  font-medium"
+              className="text-foreground hover:text-primary font-medium"
             >
               常见问题
             </button>
             <Link
+              href="/models"
+              className="text-foreground hover:text-primary font-medium"
+            >
+              语音模型
+            </Link>
+            <Link
               href="/history"
-              className="text-foreground hover:text-primary font-medium   "
+              className="text-foreground hover:text-primary font-medium"
             >
               生成历史
             </Link>
@@ -147,7 +155,7 @@ export function Navbar() {
                 onClick={() => scrollToSection('studio')}
                 className="block w-full text-left px-3 py-2 text-foreground hover:text-primary hover:bg-accent rounded-md transition-colors duration-200"
               >
-                复刻
+                克隆
               </button>
               <button
                 onClick={() => scrollToSection('pricing')}
@@ -162,6 +170,14 @@ export function Navbar() {
                 常见问题
               </button>
               <Link
+                href="/models"
+                className="flex items-center gap-2 px-3 py-2 text-foreground hover:text-primary hover:bg-accent rounded-md transition-colors duration-200"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <User className="h-4 w-4" />
+                语音模型
+              </Link>
+              <Link
                 href="/history"
                 className="flex items-center gap-2 px-3 py-2 text-foreground hover:text-primary hover:bg-accent rounded-md transition-colors duration-200"
                 onClick={() => setIsMenuOpen(false)}
@@ -169,6 +185,30 @@ export function Navbar() {
                 <History className="h-4 w-4" />
                 生成历史
               </Link>
+
+              {/* Mobile Voice Model Indicator */}
+              {selectedVoiceModel && (
+                <div className="mx-3 my-2 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Mic className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium text-primary">
+                        当前模型: {selectedVoiceModel.displayName}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        clearSelectedVoiceModel();
+                        setIsMenuOpen(false);
+                      }}
+                      className="text-primary/60 hover:text-primary text-sm px-2 py-1 rounded"
+                      title="清除选择"
+                    >
+                      清除
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Mobile Controls */}
               <div className="border-t border-border pt-2 mt-2 space-y-2">

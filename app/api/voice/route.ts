@@ -334,3 +334,74 @@ export async function POST(request: NextRequest) {
         await prisma.$disconnect();
     }
 }
+
+// 删除语音模型
+export async function DELETE(request: NextRequest) {
+    try {
+        // 验证用户身份
+        const supabase = createClient();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+            return NextResponse.json(
+                { error: 'Unauthorized - Please log in to delete voice models' },
+                { status: 401 }
+            );
+        }
+
+        // 解析请求体
+        const body = await request.json();
+        const { modelId } = body;
+
+        if (!modelId || typeof modelId !== 'string') {
+            return NextResponse.json(
+                { error: 'Model ID is required' },
+                { status: 400 }
+            );
+        }
+
+        // 检查模型是否存在且属于当前用户
+        const voiceModel = await prisma.voiceModel.findFirst({
+            where: {
+                modelId: modelId,
+                userId: user.id
+            }
+        });
+
+        if (!voiceModel) {
+            return NextResponse.json(
+                { error: 'Voice model not found or you do not have permission to delete it' },
+                { status: 404 }
+            );
+        }
+
+        // 删除与该模型相关的所有语音生成记录
+        await prisma.voice.deleteMany({
+            where: {
+                vmId: modelId,
+                userId: user.id
+            }
+        });
+
+        // 删除语音模型
+        await prisma.voiceModel.delete({
+            where: {
+                id: voiceModel.id
+            }
+        });
+
+        return NextResponse.json({
+            success: true,
+            message: 'Voice model and related generations deleted successfully'
+        });
+
+    } catch (error) {
+        console.error('Delete voice model error:', error);
+        return NextResponse.json(
+            { error: 'Internal server error' },
+            { status: 500 }
+        );
+    } finally {
+        await prisma.$disconnect();
+    }
+}

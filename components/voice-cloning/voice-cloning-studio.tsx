@@ -6,6 +6,7 @@ import { AudioRecorder } from './audio-recorder';
 import { FileUploader } from './file-uploader';
 import { TextToSpeech } from './text-to-speech';
 import { useTranslation } from '@/providers/language-provider';
+import { useVoiceModel } from '@/providers/voice-model-provider';
 import { createClient } from '@/lib/supabase-client';
 
 type Step = 'input' | 'consent' | 'generate';
@@ -43,6 +44,7 @@ const SUPPORTED_LANGUAGES = {
 
 export function VoiceCloningStudio() {
   const { t } = useTranslation();
+  const { selectedVoiceModel, clearSelectedVoiceModel } = useVoiceModel();
   const [currentStep, setCurrentStep] = useState<Step>('input');
   const [inputMethod, setInputMethod] = useState<InputMethod>('record');
   const [voiceData, setVoiceData] = useState<{
@@ -62,6 +64,26 @@ export function VoiceCloningStudio() {
   const [userFullName, setUserFullName] = useState<string>('');
   const [isCreatingVoice, setIsCreatingVoice] = useState(false);
   const [voiceCreated, setVoiceCreated] = useState<any>(null);
+
+  // 检测选中的语音模型，如果有则直接跳转到生成步骤
+  useEffect(() => {
+    if (selectedVoiceModel) {
+      setCurrentStep('generate');
+      setVoiceCreated({
+        id: selectedVoiceModel.modelId,
+        displayName: selectedVoiceModel.displayName,
+        gender: selectedVoiceModel.gender,
+        locale: selectedVoiceModel.locale,
+        avatarImage: selectedVoiceModel.avatarImage
+      });
+      setUserInfo(prev => ({
+        ...prev,
+        name: selectedVoiceModel.displayName,
+        gender: selectedVoiceModel.gender as 'male' | 'female',
+        language: selectedVoiceModel.locale || 'en'
+      }));
+    }
+  }, [selectedVoiceModel]);
 
   // 获取用户信息
   useEffect(() => {
@@ -317,6 +339,8 @@ export function VoiceCloningStudio() {
       language: 'en'
     });
     setVoiceCreated(null);
+    // 清除选中的语音模型
+    clearSelectedVoiceModel();
   };
 
   // 处理语音生成
@@ -663,29 +687,62 @@ export function VoiceCloningStudio() {
               文本转语音
             </h2>
             <p className="text-lg text-muted-foreground">
-              语音模型创建成功！现在您可以输入文本生成语音了
+              {selectedVoiceModel 
+                ? `正在使用语音模型：${selectedVoiceModel.displayName}` 
+                : '语音模型创建成功！现在您可以输入文本生成语音了'
+              }
             </p>
           </div>
 
           {/* 语音模型信息 */}
           <div className="glass-card rounded-lg p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-green-600" />
-              </div>
+              {selectedVoiceModel?.avatarImage ? (
+                <img
+                  src={selectedVoiceModel.avatarImage}
+                  alt={selectedVoiceModel.displayName}
+                  className="w-10 h-10 rounded-lg object-cover border-2 border-muted"
+                />
+              ) : (
+                <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                  <Sparkles className="h-5 w-5 text-green-600" />
+                </div>
+              )}
               <div>
                 <div className="font-medium">{userInfo.name}</div>
-                <div className="text-sm text-muted-foreground">
-                  语音模型ID: {voiceCreated.id}
+                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                  <span>语音模型ID: {voiceCreated.id}</span>
+                  {selectedVoiceModel && (
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      selectedVoiceModel.gender === 'male' 
+                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                        : 'bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300'
+                    }`}>
+                      {selectedVoiceModel.gender === 'male' ? '男声' : '女声'}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
-            <button
-              onClick={resetStudio}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              创建新模型
-            </button>
+            <div className="flex items-center gap-2">
+              {selectedVoiceModel && (
+                <button
+                  onClick={() => {
+                    clearSelectedVoiceModel();
+                    window.location.href = '/models';
+                  }}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  返回模型列表
+                </button>
+              )}
+              <button
+                onClick={resetStudio}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {selectedVoiceModel ? '创建新模型' : '创建新模型'}
+              </button>
+            </div>
           </div>
 
           {/* 文本转语音组件 */}

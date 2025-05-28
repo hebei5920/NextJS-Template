@@ -1,7 +1,7 @@
 'use client';
 
 import { Navbar } from '@/components/ui/navbar';
-import { GenerationHistory } from '@/components/voice-cloning/generation-history';
+import { VoiceGenerationsHistory } from '@/components/voice-cloning/voice-generations-history';
 
 export default function HistoryPage() {
   return (
@@ -16,11 +16,11 @@ export default function HistoryPage() {
               生成历史
             </h1>
             <p className="text-xl text-muted-foreground">
-              查看您的所有语音生成记录
+              查看和管理您的所有AI语音生成记录
             </p>
           </div>
           
-          <GenerationHistory />
+          <VoiceGenerationsHistory />
         </div>
       </main>
     </div>

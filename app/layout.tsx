@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/providers/theme-provider';
 import { LanguageProvider } from '@/providers/language-provider';
+import { VoiceModelProvider } from '@/providers/voice-model-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -26,9 +27,11 @@ export default function RootLayout({
           enableSystem
         >
           <LanguageProvider>
-            <div className="min-h-screen bg-background text-foreground">
-              {children}
-            </div>
+            <VoiceModelProvider>
+              <div className="min-h-screen bg-background text-foreground">
+                {children}
+              </div>
+            </VoiceModelProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>
