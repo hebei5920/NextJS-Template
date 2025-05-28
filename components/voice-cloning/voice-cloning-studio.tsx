@@ -130,7 +130,7 @@ export function VoiceCloningStudio() {
           
           // 设置默认的模型名称
           if (!userInfo.name && fullName) {
-            setUserInfo(prev => ({ ...prev, name: `${fullName}的语音模型` }));
+            setUserInfo(prev => ({ ...prev, name: `${fullName}${t('components.voiceCloning.defaultModelName')}` }));
           }
         }
       } catch (error) {
@@ -322,7 +322,7 @@ export function VoiceCloningStudio() {
       }
     } catch (error) {
       console.error('Voice creation failed:', error);
-      alert('语音模型创建失败，请稍后重试');
+      alert(t('components.voiceCloning.modelCreationFailed'));
     } finally {
       setIsCreatingVoice(false);
     }
@@ -363,7 +363,7 @@ export function VoiceCloningStudio() {
             <div className="w-6 h-6 rounded-full bg-current/20 flex items-center justify-center text-sm font-bold">
               1
             </div>
-            <span className="font-medium">音色采集</span>
+            <span className="font-medium">{t('components.voiceCloning.stepVoiceCollection')}</span>
           </div>
 
           <ArrowRight className="h-5 w-5 text-muted-foreground" />
@@ -377,7 +377,7 @@ export function VoiceCloningStudio() {
             <div className="w-6 h-6 rounded-full bg-current/20 flex items-center justify-center text-sm font-bold">
               2
             </div>
-            <span className="font-medium">信息确认</span>
+            <span className="font-medium">{t('components.voiceCloning.stepInfoConfirmation')}</span>
           </div>
 
           <ArrowRight className="h-5 w-5 text-muted-foreground" />
@@ -389,7 +389,7 @@ export function VoiceCloningStudio() {
             <div className="w-6 h-6 rounded-full bg-current/20 flex items-center justify-center text-sm font-bold">
               3
             </div>
-            <span className="font-medium">语音生成</span>
+            <span className="font-medium">{t('components.voiceCloning.stepVoiceGeneration')}</span>
           </div>
         </div>
       </div>
@@ -400,11 +400,11 @@ export function VoiceCloningStudio() {
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold">
               <span className="bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                AI 语音克隆工作室
+                {t('components.voiceCloning.title')}
               </span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              通过录制或上传您的音频样本，我们的AI将学习您的声音特征，为您生成逼真的语音克隆
+              {t('components.voiceCloning.description')}
             </p>
           </div>
 
@@ -419,7 +419,7 @@ export function VoiceCloningStudio() {
                   }`}
               >
                 <Mic className="h-4 w-4" />
-                录制音频
+                {t('components.voiceCloning.recordAudio')}
               </button>
               <button
                 onClick={() => setInputMethod('upload')}
@@ -429,7 +429,7 @@ export function VoiceCloningStudio() {
                   }`}
               >
                 <Upload className="h-4 w-4" />
-                上传文件
+                {t('components.voiceCloning.uploadFile')}
               </button>
             </div>
           </div>
@@ -441,10 +441,10 @@ export function VoiceCloningStudio() {
                 <div className="text-center">
                   <h3 className="text-2xl font-semibold mb-2 flex items-center justify-center gap-2">
                     <Mic className="h-6 w-6 text-primary" />
-                    录制您的声音
+                    {t('components.voiceCloning.recordTitle')}
                   </h3>
                   <p className="text-muted-foreground">
-                    请清晰地朗读一段文字，录音时长至少3秒，建议10-30秒以获得最佳效果
+                    {t('components.voiceCloning.recordDescription')}
                   </p>
                 </div>
                 <AudioRecorder onRecordingComplete={handleRecordingComplete} />
@@ -454,10 +454,10 @@ export function VoiceCloningStudio() {
                 <div className="text-center">
                   <h3 className="text-2xl font-semibold mb-2 flex items-center justify-center gap-2">
                     <Upload className="h-6 w-6 text-primary" />
-                    上传音频文件
+                    {t('components.voiceCloning.uploadTitle')}
                   </h3>
                   <p className="text-muted-foreground">
-                    支持 MP3、WAV、OGG、AAC、WebM 格式，文件大小不超过50MB
+                    {t('components.voiceCloning.uploadDescription')}
                   </p>
                 </div>
                 <FileUploader onFileUpload={handleFileUpload} />
@@ -473,7 +473,7 @@ export function VoiceCloningStudio() {
                 className="btn-primary flex items-center gap-2 text-lg px-8 py-4"
               >
                 <ArrowRight className="h-5 w-5" />
-                下一步：填写信息
+                {t('components.voiceCloning.nextStep')}
               </button>
             </div>
           )}
@@ -481,13 +481,13 @@ export function VoiceCloningStudio() {
           {/* 提示信息 */}
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
             <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-              💡 获得最佳效果的建议：
+              {t('components.voiceCloning.tipsTitle')}
             </h4>
             <ul className="text-blue-800 dark:text-blue-200 text-sm space-y-1">
-              <li>• 在安静的环境中录制，避免背景噪音</li>
-              <li>• 使用清晰、自然的语调，避免过快或过慢</li>
-              <li>• 录制时长建议在10-30秒之间</li>
-              <li>• 朗读内容应包含多种音素，如数字、标点等</li>
+              <li>• {t('components.voiceCloning.tips.quiet')}</li>
+              <li>• {t('components.voiceCloning.tips.natural')}</li>
+              <li>• {t('components.voiceCloning.tips.duration')}</li>
+              <li>• {t('components.voiceCloning.tips.content')}</li>
             </ul>
           </div>
         </div>
@@ -499,10 +499,10 @@ export function VoiceCloningStudio() {
           <div className="text-center space-y-4">
             <h2 className="text-3xl font-bold flex items-center justify-center gap-2">
               <User className="h-8 w-8 text-primary" />
-              信息确认与授权
+              {t('components.voiceCloning.consentTitle')}
             </h2>
             <p className="text-lg text-muted-foreground">
-              请填写必要信息并确认您同意创建语音模型
+              {t('components.voiceCloning.consentDescription')}
             </p>
           </div>
 
@@ -517,9 +517,9 @@ export function VoiceCloningStudio() {
                 )}
               </div>
               <div>
-                <div className="font-medium">音频样本已就绪</div>
+                <div className="font-medium">{t('components.voiceCloning.audioReady')}</div>
                 <div className="text-sm text-muted-foreground">
-                  来源：{voiceData?.method === 'record' ? '录制' : '上传文件'}
+                  {t('components.voiceCloning.audioSource')}{voiceData?.method === 'record' ? t('components.voiceCloning.recorded') : t('components.voiceCloning.uploaded')}
                 </div>
               </div>
             </div>
@@ -527,7 +527,7 @@ export function VoiceCloningStudio() {
               onClick={resetStudio}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              重新录制
+              {t('components.voiceCloning.reRecord')}
             </button>
           </div>
 
@@ -538,13 +538,13 @@ export function VoiceCloningStudio() {
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
                   <User className="h-4 w-4" />
-                  用户信息
+                  {t('components.voiceCloning.userInfo')}
                 </h4>
                 <p className="text-blue-800 dark:text-blue-200 text-sm">
-                  授权用户：{userFullName}
+                  {t('components.voiceCloning.authorizedUser')}{userFullName}
                 </p>
                 <p className="text-blue-600 dark:text-blue-300 text-xs mt-1">
-                  此信息将用于语音模型的授权记录
+                  {t('components.voiceCloning.authNote')}
                 </p>
               </div>
             )}
@@ -553,17 +553,17 @@ export function VoiceCloningStudio() {
               {/* 模型名称输入 */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                  模型名称 <span className="text-red-500">*</span>
+                  {t('components.voiceCloning.modelName')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={userInfo.name}
                   onChange={(e) => setUserInfo(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="请输入模型名称"
+                  placeholder={t('components.voiceCloning.modelNamePlaceholder')}
                   className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                 />
                 <p className="text-xs text-muted-foreground">
-                  为您的语音模型起一个容易识别的名称
+                  {t('components.voiceCloning.modelNameHelper')}
                 </p>
               </div>
 
@@ -571,14 +571,14 @@ export function VoiceCloningStudio() {
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <Globe className="h-4 w-4" />
-                  语言
+                  {t('components.voiceCloning.language')}
                 </label>
                 <select
                   value={userInfo.language}
                   onChange={(e) => setUserInfo(prev => ({ ...prev, language: e.target.value }))}
                   className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                 >
-                  <optgroup label="完全支持">
+                  <optgroup label={t('components.voiceCloning.languageOptions.fullSupport')}>
                     <option value="en">English</option>
                     <option value="fr-FR">French</option>
                     <option value="de-DE">German</option>
@@ -586,7 +586,7 @@ export function VoiceCloningStudio() {
                     <option value="pt-BR">Portuguese (Brazil)</option>
                     <option value="pt-PT">Portuguese (Portugal)</option>
                   </optgroup>
-                  <optgroup label="Beta版本">
+                  <optgroup label={t('components.voiceCloning.languageOptions.beta')}>
                     <option value="ar-AE">Arabic</option>
                     <option value="da-DK">Danish</option>
                     <option value="nl-NL">Dutch</option>
@@ -607,14 +607,14 @@ export function VoiceCloningStudio() {
                   </optgroup>
                 </select>
                 <p className="text-xs text-muted-foreground">
-                  选择语音模型的主要语言，支持跨语言合成
+                  {t('components.voiceCloning.languageHelper')}
                 </p>
               </div>
             </div>
 
             {/* 性别选择 */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">性别</label>
+              <label className="text-sm font-medium">{t('components.voiceCloning.gender')}</label>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -625,7 +625,7 @@ export function VoiceCloningStudio() {
                     onChange={(e) => setUserInfo(prev => ({ ...prev, gender: e.target.value as 'male' | 'female' }))}
                     className="text-primary focus:ring-primary"
                   />
-                  <span>男性</span>
+                  <span>{t('components.voiceCloning.male')}</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -636,21 +636,16 @@ export function VoiceCloningStudio() {
                     onChange={(e) => setUserInfo(prev => ({ ...prev, gender: e.target.value as 'male' | 'female' }))}
                     className="text-primary focus:ring-primary"
                   />
-                  <span>女性</span>
+                  <span>{t('components.voiceCloning.female')}</span>
                 </label>
               </div>
             </div>
 
             {/* 同意条款 */}
             <div className="bg-muted/50 rounded-lg p-4 text-sm">
-              <h4 className="font-semibold mb-2">授权声明</h4>
+              <h4 className="font-semibold mb-2">{t('components.voiceCloning.authTitle')}</h4>
               <p className="text-muted-foreground leading-relaxed">
-                我确认并同意：<br />
-                1. 我拥有所提供音频的合法权利<br />
-                2. 同意将此音频用于语音模型训练<br />
-                3. 理解生成的语音模型可能被用于文本转语音服务<br />
-                4. 我的姓名和邮箱将作为授权记录保存<br />
-                5. 语音克隆技术支持跨语言合成，无语言限制
+                {t('components.voiceCloning.authContent')}
               </p>
             </div>
 
@@ -664,12 +659,12 @@ export function VoiceCloningStudio() {
                 {isCreatingVoice ? (
                   <>
                     <Sparkles className="h-5 w-5 animate-spin" />
-                    创建中...
+                    {t('components.voiceCloning.creating')}
                   </>
                 ) : (
                   <>
                     <Sparkles className="h-5 w-5" />
-                    创建语音模型
+                    {t('components.voiceCloning.createModel')}
                   </>
                 )}
               </button>
@@ -684,12 +679,12 @@ export function VoiceCloningStudio() {
           <div className="text-center space-y-4">
             <h2 className="text-3xl font-bold flex items-center justify-center gap-2">
               <Type className="h-8 w-8 text-primary" />
-              文本转语音
+              {t('components.voiceCloning.ttsTitle')}
             </h2>
             <p className="text-lg text-muted-foreground">
               {selectedVoiceModel 
-                ? `正在使用语音模型：${selectedVoiceModel.displayName}` 
-                : '语音模型创建成功！现在您可以输入文本生成语音了'
+                ? `${t('components.voiceCloning.usingModel')}${selectedVoiceModel.displayName}` 
+                : t('components.voiceCloning.ttsDescription')
               }
             </p>
           </div>
@@ -711,14 +706,14 @@ export function VoiceCloningStudio() {
               <div>
                 <div className="font-medium">{userInfo.name}</div>
                 <div className="text-sm text-muted-foreground flex items-center gap-2">
-                  <span>语音模型ID: {voiceCreated.id}</span>
+                  <span>{t('components.voiceCloning.modelId')}{voiceCreated.id}</span>
                   {selectedVoiceModel && (
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       selectedVoiceModel.gender === 'male' 
                         ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
                         : 'bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300'
                     }`}>
-                      {selectedVoiceModel.gender === 'male' ? '男声' : '女声'}
+                      {selectedVoiceModel.gender === 'male' ? t('components.voiceModels.maleVoice') : t('components.voiceModels.femaleVoice')}
                     </span>
                   )}
                 </div>
@@ -733,14 +728,14 @@ export function VoiceCloningStudio() {
                   }}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  返回模型列表
+                  {t('components.voiceCloning.backToModels')}
                 </button>
               )}
               <button
                 onClick={resetStudio}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                {selectedVoiceModel ? '创建新模型' : '创建新模型'}
+                {t('components.voiceCloning.createNewModel')}
               </button>
             </div>
           </div>

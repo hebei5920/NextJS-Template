@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
     try {
-        // 验证用户身份
+        // Verify user identity
         const supabase = createClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { text, voiceId } = body;
 
-        // 输入验证
+        // Input validation
         if (!text || typeof text !== 'string') {
             return NextResponse.json(
                 { error: 'Text is required and must be a string' },
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 检查环境变量
+        // Check environment variables
         const speechifyToken = process.env.SPEECHIFY_KEY;
         if (!speechifyToken) {
             return NextResponse.json(
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 调用 Speechify 文本转语音 API
+        // Call Speechify text-to-speech API
         const speechifyResponse = await fetch('https://api.sws.speechify.com/v1/audio/speech', {
             method: 'POST',
             headers: {
@@ -85,12 +85,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 获取音频数据
+        // Get audio data
         const audioBuffer = await speechifyResponse.arrayBuffer();
         const audioBase64 = Buffer.from(audioBuffer).toString('base64');
         const audioUrl = `data:audio/mp3;base64,${audioBase64}`;
 
-        // 记录使用历史
+        // Record usage history
         try {
             await supabase
                 .from('tts_usage')
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
                 text: text,
                 audioUrl: audioUrl,
                 voiceId: voiceId,
-                duration: Math.ceil(text.length / 15), // 估算音频时长（秒）
+                duration: Math.ceil(text.length / 15), // Estimate audio duration (seconds)
                 generatedAt: new Date().toISOString()
             }
         });

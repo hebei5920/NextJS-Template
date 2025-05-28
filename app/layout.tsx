@@ -8,9 +8,9 @@ import { VoiceModelProvider } from '@/providers/voice-model-provider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'AI 语音克隆工作室 - Voice Cloning Studio',
-  description: '使用最先进的AI技术，只需几秒钟的音频样本，即可创建逼真的语音克隆。让您的声音在数字世界中永远传承。',
-  keywords: 'AI, 语音克隆, Voice Cloning, TTS, 文本转语音, AI语音, 语音合成',
+  title: 'AI Voice Cloning Studio - AI 语音克隆工作室',
+  description: 'Create realistic voice clones with advanced AI technology using just a few seconds of audio samples. Let your voice live forever in the digital world.',
+  keywords: 'AI, Voice Cloning, TTS, Text to Speech, AI Voice, Voice Synthesis, 语音克隆, AI语音',
 };
 
 export default function RootLayout({

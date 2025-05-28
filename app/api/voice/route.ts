@@ -5,7 +5,7 @@ import { createServerMediaService } from "@/service/media-service";
 
 const prisma = new PrismaClient();
 
-// Speechify TTS API 类型定义
+// Speechify TTS API type definitions
 interface SpeechifyTTSRequest {
     input: string;
     voice_id: string;
@@ -33,9 +33,9 @@ interface SpeechifyTTSResponse {
     };
 }
 
-// Speechify支持的语言列表
+// Speechify supported languages list
 const SUPPORTED_LANGUAGES = {
-  // 完全支持的语言
+  // Fully supported languages
   'en': 'English',
   'fr-FR': 'French',
   'de-DE': 'German', 
@@ -43,7 +43,7 @@ const SUPPORTED_LANGUAGES = {
   'pt-BR': 'Portuguese (Brazil)',
   'pt-PT': 'Portuguese (Portugal)',
   
-  // Beta语言
+  // Beta languages
   'ar-AE': 'Arabic',
   'da-DK': 'Danish',
   'nl-NL': 'Dutch',
@@ -63,10 +63,10 @@ const SUPPORTED_LANGUAGES = {
   'vi-VN': 'Vietnamese'
 };
 
-// 获取语音模型列表
+// Get voice models list
 export async function GET(request: NextRequest) {
     try {
-        // 验证用户身份
+        // Verify user identity
         const supabase = createClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // 获取用户的语音模型
+        // Get user's voice models
         const voiceModels = await prisma.voiceModel.findMany({
             where: {
                 userId: user.id
@@ -101,10 +101,10 @@ export async function GET(request: NextRequest) {
     }
 }
 
-// 文本转语音 API
+// Text-to-speech API
 export async function POST(request: NextRequest) {
     try {
-        // 验证用户身份
+        // Verify user identity
         const supabase = createClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 解析请求体
+        // Parse request body
         const body = await request.json();
         const { 
             input, 
@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
             options = {}
         } = body;
 
-        // 输入验证
+        // Input validation
         if (!input || typeof input !== 'string') {
             return NextResponse.json(
                 { error: 'Input is required and must be a string' },
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 验证音频格式
+        // Validate audio format
         const validFormats = ['wav', 'mp3', 'ogg', 'aac'];
         if (!validFormats.includes(audio_format)) {
             return NextResponse.json(
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 验证模型
+        // Validate model
         const validModels = ['simba-english', 'simba-multilingual'];
         if (!validModels.includes(model)) {
             return NextResponse.json(
@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 验证语言参数（可选）
+        // Validate language parameter (optional)
         if (language && !SUPPORTED_LANGUAGES[language as keyof typeof SUPPORTED_LANGUAGES]) {
             return NextResponse.json(
                 { error: `Unsupported language. Supported languages: ${Object.keys(SUPPORTED_LANGUAGES).join(', ')}` },
@@ -181,7 +181,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 验证选项
+        // Validate options
         const { loudness_normalization, text_normalization } = options;
         if (loudness_normalization !== undefined && typeof loudness_normalization !== 'boolean') {
             return NextResponse.json(
@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 检查环境变量
+        // Check environment variables
         const speechifyToken = process.env.SPEECHIFY_KEY;
         if (!speechifyToken) {
             return NextResponse.json(
@@ -206,7 +206,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 构建 Speechify API 请求
+        // Build Speechify API request
         const speechifyRequest: SpeechifyTTSRequest = {
             input,
             voice_id,
@@ -214,12 +214,12 @@ export async function POST(request: NextRequest) {
             model
         };
 
-        // 添加语言参数（如果提供）
+        // Add language parameter (if provided)
         if (language) {
             speechifyRequest.language = language;
         }
 
-        // 添加可选参数
+        // Add optional parameters
         if (Object.keys(options).length > 0) {
             speechifyRequest.options = {};
             
@@ -247,7 +247,7 @@ export async function POST(request: NextRequest) {
             const errorText = await speechifyResponse.text();
             console.error('TTS API error:', errorText);
             
-            // 尝试解析错误响应
+            // Try to parse error response
             let errorDetails;
             try {
                 errorDetails = JSON.parse(errorText);
@@ -265,13 +265,13 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 解析 Speechify 响应
+        // Parse Speechify response
         const speechifyResult: SpeechifyTTSResponse = await speechifyResponse.json();
         
-        // 将 Base64 音频数据转换为 Buffer
+        // Convert Base64 audio data to Buffer
         const audioBuffer = Buffer.from(speechifyResult.audio_data, 'base64');
         
-        // 创建 File 对象用于 media-service（Node.js 环境兼容）
+        // Create File object for media-service (Node.js compatibility)
         const fileName = `tts-${Date.now()}.${speechifyResult.audio_format}`;
         const audioFile = new File(
             [audioBuffer], 
@@ -279,7 +279,7 @@ export async function POST(request: NextRequest) {
             { type: `audio/${speechifyResult.audio_format}` }
         );
 
-        // 使用 media-service 上传音频文件
+        // Use media-service to upload audio file
         const mediaService = createServerMediaService();
         const uploadResult = await mediaService.uploadAudio({
             file: audioFile,
@@ -287,7 +287,7 @@ export async function POST(request: NextRequest) {
             bucket: 'media'
         });
 
-        // 保存语音记录到数据库
+        // Save speech record to database
         const voiceRecord = await prisma.voice.create({
             data: {
                 vmId: voice_id,
@@ -335,10 +335,10 @@ export async function POST(request: NextRequest) {
     }
 }
 
-// 删除语音模型
+// Delete voice model
 export async function DELETE(request: NextRequest) {
     try {
-        // 验证用户身份
+        // Verify user identity
         const supabase = createClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -349,7 +349,7 @@ export async function DELETE(request: NextRequest) {
             );
         }
 
-        // 解析请求体
+        // Parse request body
         const body = await request.json();
         const { modelId } = body;
 
@@ -360,7 +360,7 @@ export async function DELETE(request: NextRequest) {
             );
         }
 
-        // 检查模型是否存在且属于当前用户
+        // Check if model exists and belongs to current user
         const voiceModel = await prisma.voiceModel.findFirst({
             where: {
                 modelId: modelId,
@@ -375,7 +375,7 @@ export async function DELETE(request: NextRequest) {
             );
         }
 
-        // 删除与该模型相关的所有语音生成记录
+        // Delete all speech generation records related to this model
         await prisma.voice.deleteMany({
             where: {
                 vmId: modelId,
@@ -383,7 +383,7 @@ export async function DELETE(request: NextRequest) {
             }
         });
 
-        // 删除语音模型
+        // Delete voice model
         await prisma.voiceModel.delete({
             where: {
                 id: voiceModel.id

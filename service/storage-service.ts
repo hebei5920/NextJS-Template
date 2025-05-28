@@ -97,7 +97,7 @@ export class StorageService {
     if (!ALL_SUPPORTED_TYPES.includes(file.type)) {
       return {
         isValid: false,
-        error: `不支持的文件类型: ${file.type}`
+        error: `Unsupported file type: ${file.type}`
       }
     }
 
@@ -112,7 +112,7 @@ export class StorageService {
     } else {
       return {
         isValid: false,
-        error: '未知的文件类型'
+        error: 'Unknown file type'
       }
     }
 
@@ -120,7 +120,7 @@ export class StorageService {
       const limitMB = Math.round(sizeLimit / (1024 * 1024))
       return {
         isValid: false,
-        error: `文件大小不能超过 ${limitMB}MB`
+        error: `File size cannot exceed ${limitMB}MB`
       }
     }
 

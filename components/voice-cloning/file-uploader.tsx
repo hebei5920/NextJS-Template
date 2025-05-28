@@ -43,9 +43,10 @@ export function FileUploader({
   const validateFile = useCallback(async (file: File): Promise<{ isValid: boolean; error?: string; duration?: number }> => {
     // 检查文件类型
     if (!acceptedFormats.includes(file.type)) {
+      const formats = acceptedFormats.map(f => f.split('/')[1].toUpperCase()).join(', ');
       return { 
         isValid: false, 
-        error: `不支持的文件格式。支持的格式：${acceptedFormats.map(f => f.split('/')[1].toUpperCase()).join(', ')}` 
+        error: t('components.fileUploader.unsupportedFormat').replace('{formats}', formats)
       };
     }
 
@@ -54,7 +55,7 @@ export function FileUploader({
     if (fileSizeMB > maxSize) {
       return { 
         isValid: false, 
-        error: `文件大小超过限制（最大 ${maxSize}MB）` 
+        error: t('components.fileUploader.fileSizeExceeded').replace('{maxSize}', maxSize.toString())
       };
     }
 
@@ -70,7 +71,7 @@ export function FileUploader({
         if (audioDuration < minDuration) {
           resolve({
             isValid: false,
-            error: `音频时长不足，至少需要 ${minDuration} 秒`,
+            error: t('components.fileUploader.durationTooShort').replace('{minDuration}', minDuration.toString()),
             duration: audioDuration
           });
         } else {
@@ -85,13 +86,13 @@ export function FileUploader({
         URL.revokeObjectURL(url);
         resolve({
           isValid: false,
-          error: '无法解析音频文件'
+          error: t('components.fileUploader.cannotParseAudio')
         });
       };
       
       audio.src = url;
     });
-  }, [acceptedFormats, maxSize, minDuration]);
+  }, [acceptedFormats, maxSize, minDuration, t]);
 
   // 处理文件选择
   const handleFileSelect = useCallback(async (file: File) => {
@@ -102,7 +103,7 @@ export function FileUploader({
       const validation = await validateFile(file);
       
       if (!validation.isValid) {
-        setError(validation.error || '文件验证失败');
+        setError(validation.error || t('components.fileUploader.validationFailed'));
         setIsValidating(false);
         return;
       }
@@ -117,10 +118,10 @@ export function FileUploader({
       onFileUpload(file, url);
       
     } catch (err) {
-      setError('处理文件时出错');
+      setError(t('components.fileUploader.processingError'));
       setIsValidating(false);
     }
-  }, [validateFile, onFileUpload]);
+  }, [validateFile, onFileUpload, t]);
 
   // 拖拽处理
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -210,30 +211,30 @@ export function FileUploader({
               <Upload className="h-8 w-8 text-primary" />
             </div>
             <div className="text-lg font-medium mb-2">
-              {isDragOver ? '释放文件以上传' : '上传音频文件'}
+              {isDragOver ? t('components.fileUploader.dropToUpload') : t('components.fileUploader.uploadAudioFile')}
             </div>
             <div className="text-sm text-muted-foreground mb-6">
-              点击选择文件或拖拽文件到这里
+              {t('components.fileUploader.clickOrDragHelper')}
             </div>
             <div className="bg-muted/50 rounded-lg p-4 text-xs text-muted-foreground space-y-1">
               <div className="flex items-center justify-start gap-2">
                 <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                <span>支持格式：wav、mp3、ogg、aac</span>
+                <span>{t('components.fileUploader.supportedFormats')}</span>
               </div>
               <div className="flex items-center justify-start gap-2">
                 <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                <span>最大文件大小：{maxSize}MB</span>
+                <span>{t('components.fileUploader.maxFileSize').replace('{maxSize}', maxSize.toString())}</span>
               </div>
               <div className="flex items-center justify-start gap-2">
                 <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
-                <span>最短时长：{minDuration}秒</span>
+                <span>{t('components.fileUploader.minDuration').replace('{minDuration}', minDuration.toString())}</span>
               </div>
             </div>
             
             {isValidating && (
               <div className="mt-6 flex items-center justify-center gap-2 text-sm text-primary">
                 <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                正在验证文件...
+                {t('components.fileUploader.validatingFile')}
               </div>
             )}
           </div>
@@ -267,7 +268,7 @@ export function FileUploader({
           {duration && duration >= minDuration && (
             <div className="flex items-center gap-2 text-green-600 text-sm mb-4 bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
               <CheckCircle className="h-4 w-4" />
-              文件验证通过
+              {t('components.fileUploader.fileValidated')}
             </div>
           )}
 
@@ -278,7 +279,7 @@ export function FileUploader({
               className="btn-secondary flex items-center gap-2 flex-1"
             >
               {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-              {isPlaying ? '暂停' : '播放'}
+              {isPlaying ? t('components.fileUploader.pause') : t('components.fileUploader.play')}
             </button>
           </div>
         </div>

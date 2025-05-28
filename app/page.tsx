@@ -42,14 +42,13 @@ export default function Home() {
           <div className="space-y-4">
             <h1 className="text-5xl md:text-7xl font-bold">
               <span className="bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                AI 语音克隆
+                {t('home.hero.title')}
               </span>
               <br />
-              <span className="text-foreground">工作室</span>
+              <span className="text-foreground">{t('home.hero.subtitle')}</span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              使用最先进的AI技术，只需几秒钟的音频样本，即可创建逼真的语音克隆。
-              让您的声音在数字世界中永远传承。
+              {t('home.hero.description')}
             </p>
           </div>
 
@@ -59,9 +58,9 @@ export default function Home() {
               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Mic className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="font-semibold mb-2">简单录制</h3>
+              <h3 className="font-semibold mb-2">{t('home.features.simple_recording.title')}</h3>
               <p className="text-sm text-muted-foreground">
-                只需3秒钟的清晰录音，AI即可学习您的声音特征
+                {t('home.features.simple_recording.description')}
               </p>
             </div>
             
@@ -69,9 +68,9 @@ export default function Home() {
               <div className="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Zap className="h-6 w-6 text-purple-600" />
               </div>
-              <h3 className="font-semibold mb-2">极速生成</h3>
+              <h3 className="font-semibold mb-2">{t('home.features.fast_generation.title')}</h3>
               <p className="text-sm text-muted-foreground">
-                先进的AI算法，秒级生成高质量的语音内容
+                {t('home.features.fast_generation.description')}
               </p>
             </div>
             
@@ -79,9 +78,9 @@ export default function Home() {
               <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Shield className="h-6 w-6 text-green-600" />
               </div>
-              <h3 className="font-semibold mb-2">安全可靠</h3>
+              <h3 className="font-semibold mb-2">{t('home.features.secure_reliable.title')}</h3>
               <p className="text-sm text-muted-foreground">
-                企业级安全保障，您的声音数据完全私密
+                {t('home.features.secure_reliable.description')}
               </p>
             </div>
           </div>
@@ -93,7 +92,7 @@ export default function Home() {
               className="btn-primary text-lg px-8 py-4 inline-flex items-center gap-2 hover:scale-105 transition-transform"
             >
               <Sparkles className="h-5 w-5" />
-              立即开始体验
+              {t('home.hero.cta_button')}
             </a>
           </div>
         </div>
@@ -124,15 +123,15 @@ export default function Home() {
         <div className="max-w-6xl mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Sparkles className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">AI 语音克隆工作室</span>
+            <span className="text-xl font-bold">{t('home.footer.title')}</span>
           </div>
           <p className="text-muted-foreground">
-            让每个人都能拥有属于自己的AI语音助手
+            {t('home.footer.slogan')}
           </p>
           <div className="mt-6 flex justify-center gap-6 text-sm text-muted-foreground">
-            <a href="#" className="hover:text-foreground transition-colors">隐私政策</a>
-            <a href="#" className="hover:text-foreground transition-colors">服务条款</a>
-            <a href="#" className="hover:text-foreground transition-colors">联系我们</a>
+            <a href="#" className="hover:text-foreground transition-colors">{t('common.privacy_policy')}</a>
+            <a href="#" className="hover:text-foreground transition-colors">{t('common.terms_of_service')}</a>
+            <a href="#" className="hover:text-foreground transition-colors">{t('common.contact_us')}</a>
           </div>
         </div>
       </footer>

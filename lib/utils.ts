@@ -17,9 +17,9 @@ export function formatCredits(credits: number): string {
 /**
  * 格式化用户积分显示带单位
  * @param credits 积分数值
- * @param unit 单位，默认为"积分"
- * @returns 格式化后的字符串，如 "123.4 积分"
+ * @param unit 单位，默认为"credits"
+ * @returns 格式化后的字符串，如 "123.4 credits"
  */
-export function formatCreditsWithUnit(credits: number, unit: string = '积分'): string {
+export function formatCreditsWithUnit(credits: number, unit: string = 'credits'): string {
   return `${credits.toFixed(1)} ${unit}`;
 }

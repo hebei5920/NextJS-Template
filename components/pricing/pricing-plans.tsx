@@ -22,75 +22,6 @@ interface PricingPlan {
   color: string;
 }
 
-const pricingPlans: PricingPlan[] = [
-  {
-    id: 'free',
-    name: '免费版',
-    description: '体验基础语音克隆功能',
-    price: {
-      monthly: 0,
-      yearly: 0,
-    },
-    features: [
-      '每月 3 次语音克隆',
-      '最长 30 秒音频',
-      '基础音质',
-      '标准处理速度',
-    ],
-    limitations: [
-      '有水印',
-      '不支持商业使用',
-    ],
-    icon: <Sparkles className="h-6 w-6" />,
-    color: 'text-gray-600',
-  },
-  {
-    id: 'pro',
-    name: '专业版',
-    description: '适合个人创作者和小团队',
-    price: {
-      monthly: 29,
-      yearly: 290,
-    },
-    features: [
-      '每月 100 次语音克隆',
-      '最长 5 分钟音频',
-      '高清音质',
-      '快速处理',
-      '无水印',
-      '多种音色选择',
-      '批量处理',
-    ],
-    limitations: [],
-    popular: true,
-    icon: <Zap className="h-6 w-6" />,
-    color: 'text-blue-600',
-  },
-  {
-    id: 'enterprise',
-    name: '企业版',
-    description: '为企业和专业团队定制',
-    price: {
-      monthly: 99,
-      yearly: 990,
-    },
-    features: [
-      '无限次语音克隆',
-      '无时长限制',
-      '超高清音质',
-      '优先处理',
-      '自定义音色训练',
-      'API 接口',
-      '团队协作',
-      '专属客服',
-      '商业授权',
-    ],
-    limitations: [],
-    icon: <Crown className="h-6 w-6" />,
-    color: 'text-purple-600',
-  },
-];
-
 export function PricingPlans() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -101,11 +32,81 @@ export function PricingPlans() {
 
   const isAuthenticated = !!user && !loading;
 
+  // 获取本地化的定价方案数据
+  const getPricingPlans = (): PricingPlan[] => [
+    {
+      id: 'free',
+      name: t('components.pricing.plans.free.name'),
+      description: t('components.pricing.plans.free.description'),
+      price: {
+        monthly: 0,
+        yearly: 0,
+      },
+      features: [
+        t('components.pricing.plans.free.features.clones'),
+        t('components.pricing.plans.free.features.duration'),
+        t('components.pricing.plans.free.features.quality'),
+        t('components.pricing.plans.free.features.speed'),
+      ],
+      limitations: [
+        t('components.pricing.plans.free.limitations.watermark'),
+        t('components.pricing.plans.free.limitations.commercial'),
+      ],
+      icon: <Sparkles className="h-6 w-6" />,
+      color: 'text-gray-600',
+    },
+    {
+      id: 'pro',
+      name: t('components.pricing.plans.pro.name'),
+      description: t('components.pricing.plans.pro.description'),
+      price: {
+        monthly: 29,
+        yearly: 290,
+      },
+      features: [
+        t('components.pricing.plans.pro.features.clones'),
+        t('components.pricing.plans.pro.features.duration'),
+        t('components.pricing.plans.pro.features.quality'),
+        t('components.pricing.plans.pro.features.speed'),
+        t('components.pricing.plans.pro.features.watermark'),
+        t('components.pricing.plans.pro.features.voices'),
+        t('components.pricing.plans.pro.features.batch'),
+      ],
+      limitations: [],
+      popular: true,
+      icon: <Zap className="h-6 w-6" />,
+      color: 'text-blue-600',
+    },
+    {
+      id: 'enterprise',
+      name: t('components.pricing.plans.enterprise.name'),
+      description: t('components.pricing.plans.enterprise.description'),
+      price: {
+        monthly: 99,
+        yearly: 990,
+      },
+      features: [
+        t('components.pricing.plans.enterprise.features.clones'),
+        t('components.pricing.plans.enterprise.features.duration'),
+        t('components.pricing.plans.enterprise.features.quality'),
+        t('components.pricing.plans.enterprise.features.speed'),
+        t('components.pricing.plans.enterprise.features.custom'),
+        t('components.pricing.plans.enterprise.features.api'),
+        t('components.pricing.plans.enterprise.features.team'),
+        t('components.pricing.plans.enterprise.features.support'),
+        t('components.pricing.plans.enterprise.features.license'),
+      ],
+      limitations: [],
+      icon: <Crown className="h-6 w-6" />,
+      color: 'text-purple-600',
+    },
+  ];
+
   // 简单的toast通知函数
   const showToast = (title: string, description: string, variant: 'default' | 'destructive' = 'default') => {
     // 使用浏览器原生通知或者简单的alert
     if (variant === 'destructive') {
-      alert(`错误: ${title}\n${description}`);
+      alert(`${t('common.error')}: ${title}\n${description}`);
     } else {
       alert(`${title}\n${description}`);
     }
@@ -114,12 +115,8 @@ export function PricingPlans() {
   // 处理套餐订阅
   const handleSubscription = async (type: string) => {
     if (!isAuthenticated) {
-      showToast(
-        '需要登录',
-        '请先登录账户以继续订阅',
-        'destructive'
-      );
-      router.push('/auth/login');
+ 
+      router.push('/login');
       return;
     }
 
@@ -132,8 +129,8 @@ export function PricingPlans() {
 
     if (type === 'free') {
       showToast(
-        '免费用户',
-        '您已经是免费用户，可以开始使用基础功能'
+        t('components.pricing.freeUser'),
+        t('components.pricing.freeUserDesc')
       );
       return;
     }
@@ -157,8 +154,8 @@ export function PricingPlans() {
 
       if (response.status === 500) {
         showToast(
-          '服务器错误',
-          '支付服务暂时不可用，请稍后重试',
+          t('components.pricing.serverError'),
+          t('components.pricing.serverErrorDesc'),
           'destructive'
         );
         return;
@@ -170,16 +167,16 @@ export function PricingPlans() {
       if (result?.error) {
         console.log(result.error.message);
         showToast(
-          '支付错误',
-          result.error.message || '跳转到支付页面时出错',
+          t('components.pricing.paymentError'),
+          result.error.message || t('components.pricing.paymentErrorDesc'),
           'destructive'
         );
       }
     } catch (error) {
-      console.error('订阅错误:', error);
+      console.error('Subscription error:', error);
       showToast(
-        '订阅失败',
-        '处理订阅请求时出错，请稍后重试',
+        t('components.pricing.subscriptionFailed'),
+        t('components.pricing.subscriptionFailedDesc'),
         'destructive'
       );
     } finally {
@@ -189,7 +186,7 @@ export function PricingPlans() {
   };
 
   const formatPrice = (price: number) => {
-    return price === 0 ? '免费' : `¥${price}`;
+    return price === 0 ? t('components.pricing.free') : `¥${price}`;
   };
 
   const calculateYearlySavings = (monthly: number, yearly: number) => {
@@ -205,13 +202,13 @@ export function PricingPlans() {
       {/* 标题部分 */}
       <div className="text-center mb-12">
         <h2 className="text-4xl font-bold mb-4">
-          选择适合您的
+          {t('components.pricing.title')}
           <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-            定价方案
+            {t('components.pricing.titleHighlight')}
           </span>
         </h2>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          从免费体验到企业级解决方案，我们为每个需求提供完美的语音克隆服务
+          {t('components.pricing.description')}
         </p>
       </div>
 
@@ -226,7 +223,7 @@ export function PricingPlans() {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            按月付费
+            {t('components.pricing.monthly')}
           </button>
           <button
             onClick={() => setBillingCycle('yearly')}
@@ -236,9 +233,9 @@ export function PricingPlans() {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            按年付费
+            {t('components.pricing.yearly')}
             <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-              省17%
+              {t('components.pricing.yearlySave')}
             </span>
           </button>
         </div>
@@ -246,7 +243,7 @@ export function PricingPlans() {
 
       {/* 定价卡片 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {pricingPlans.map((plan) => {
+        {getPricingPlans().map((plan) => {
           const price = plan.price[billingCycle];
           const savings = calculateYearlySavings(plan.price.monthly, plan.price.yearly);
           
@@ -259,7 +256,7 @@ export function PricingPlans() {
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                   <div className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-medium flex items-center gap-1">
                     <Star className="h-4 w-4" />
-                    最受欢迎
+                    {t('components.pricing.popular')}
                   </div>
                 </div>
               )}
@@ -279,13 +276,13 @@ export function PricingPlans() {
                   <span className="text-4xl font-bold">{formatPrice(price)}</span>
                   {price > 0 && (
                     <span className="text-muted-foreground">
-                      /{billingCycle === 'monthly' ? '月' : '年'}
+                      /{billingCycle === 'monthly' ? t('components.pricing.perMonth') : t('components.pricing.perYear')}
                     </span>
                   )}
                 </div>
                 {billingCycle === 'yearly' && savings > 0 && (
                   <div className="text-green-600 text-sm mt-2">
-                    相比按月付费节省 {savings}%
+                    {t('components.pricing.savePercent').replace('{percent}', savings.toString())}
                   </div>
                 )}
               </div>
@@ -293,7 +290,7 @@ export function PricingPlans() {
               {/* 功能列表 - 增加 flex-grow 让这部分自动填充空间 */}
               <div className="space-y-4 mb-8 flex-grow">
                 <div>
-                  <h4 className="font-semibold mb-3 text-green-600">包含功能：</h4>
+                  <h4 className="font-semibold mb-3 text-green-600">{t('components.pricing.includedFeatures')}</h4>
                   <ul className="space-y-2">
                     {plan.features.map((feature, index) => (
                       <li key={index} className="flex items-center gap-2">
@@ -306,7 +303,7 @@ export function PricingPlans() {
 
                 {plan.limitations.length > 0 && (
                   <div>
-                    <h4 className="font-semibold mb-3 text-amber-600">限制：</h4>
+                    <h4 className="font-semibold mb-3 text-amber-600">{t('components.pricing.limitations')}</h4>
                     <ul className="space-y-2">
                       {plan.limitations.map((limitation, index) => (
                         <li key={index} className="flex items-center gap-2">
@@ -333,14 +330,14 @@ export function PricingPlans() {
                   {isLoading && selectedPlan === plan.id ? (
                     <>
                       <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                      处理中...
+                      {t('components.pricing.processing')}
                     </>
                   ) : loading ? (
-                    '加载中...'
+                    t('components.pricing.loading')
                   ) : !isAuthenticated ? (
-                    plan.id === 'free' ? '开始免费使用' : '登录后订阅'
+                    plan.id === 'free' ? t('components.pricing.startFree') : t('components.pricing.loginToSubscribe')
                   ) : (
-                    plan.id === 'free' ? '开始免费使用' : '立即订阅'
+                    plan.id === 'free' ? t('components.pricing.startFree') : t('components.pricing.subscribe')
                   )}
                 </button>
               </div>
@@ -352,12 +349,12 @@ export function PricingPlans() {
       {/* 底部说明 */}
       <div className="text-center mt-12 space-y-4">
         <p className="text-muted-foreground">
-          所有计划都包含 7 天免费试用期，随时可以取消订阅
+          {t('components.pricing.trialNote')}
         </p>
         <div className="flex justify-center gap-8 text-sm text-muted-foreground">
-          <span>✓ 安全支付</span>
-          <span>✓ 即时激活</span>
-          <span>✓ 24/7 客服支持</span>
+          <span>{t('components.pricing.features.securePayment')}</span>
+          <span>{t('components.pricing.features.instantActivation')}</span>
+          <span>{t('components.pricing.features.support247')}</span>
         </div>
       </div>
     </div>

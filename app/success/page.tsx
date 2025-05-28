@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle, Sparkles, ArrowRight, Download, Mail } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useTranslation } from '@/providers/language-provider';
 
 export default function PaymentSuccessPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -59,7 +61,7 @@ export default function PaymentSuccessPage() {
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">正在确认支付状态...</p>
+          <p className="text-muted-foreground">{t('success.verifying_payment')}</p>
         </div>
       </div>
     );
@@ -90,51 +92,51 @@ export default function PaymentSuccessPage() {
           {/* 主标题 */}
           <h1 className="text-4xl font-bold mb-4">
             <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-              支付成功！
+              {t('success.title')}
             </span>
           </h1>
 
           <p className="text-xl text-muted-foreground mb-8">
-            恭喜您成功订阅了我们的服务，现在可以享受所有高级功能！
+            {t('success.subtitle')}
           </p>
 
           {/* 订单信息 */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-green-200 dark:border-green-800 mb-8">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-green-600" />
-              订阅详情
+              {t('success.order_details')}
             </h3>
 
             <div className="space-y-3 text-left">
               {user && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">用户:</span>
+                  <span className="text-muted-foreground">{t('common.user')}:</span>
                   <span className="font-medium">{user.email}</span>
                 </div>
               )}
 
               {sessionId && (
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">支付ID:</span>
+                  <span className="text-muted-foreground">{t('success.payment_id')}:</span>
                   <span className="font-mono text-sm">{sessionId.slice(0, 20)}...</span>
                 </div>
               )}
 
               <div className="flex justify-between">
-                <span className="text-muted-foreground">支付时间:</span>
+                <span className="text-muted-foreground">{t('success.payment_time')}:</span>
                 <span>{new Date().toLocaleString('zh-CN')}</span>
               </div>
 
               <div className="flex justify-between">
-                <span className="text-muted-foreground">支付状态:</span>
-                <span className="text-green-600 font-medium">✓ 已完成</span>
+                <span className="text-muted-foreground">{t('success.payment_status')}:</span>
+                <span className="text-green-600 font-medium">{t('success.completed')}</span>
               </div>
             </div>
           </div>
 
           {/* 下一步行动 */}
           <div className="space-y-4 mb-8">
-            <h3 className="text-lg font-semibold mb-4">接下来您可以：</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('success.next_steps')}</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
               <button
@@ -142,7 +144,7 @@ export default function PaymentSuccessPage() {
                 className="btn-primary flex items-center justify-center gap-2 py-3"
               >
                 <Sparkles className="w-5 h-5" />
-                开始语音克隆
+                {t('success.start_voice_cloning')}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -151,21 +153,21 @@ export default function PaymentSuccessPage() {
           {/* 服务说明 */}
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 mb-8">
             <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-3">
-              🎉 欢迎成为高级用户！
+              {t('success.welcome_premium')}
             </h4>
             <ul className="text-blue-800 dark:text-blue-200 text-sm space-y-2 text-left">
-              <li>• 您的账户已升级，可以立即使用所有高级功能</li>
-              <li>• 确认邮件将发送到您的注册邮箱</li>
-              <li>• 如有任何问题，请联系我们的客服团队</li>
-              <li>• 您可以随时在账户设置中管理您的订阅</li>
+              <li>• {t('success.premium_benefits.account_upgraded')}</li>
+              <li>• {t('success.premium_benefits.email_confirmation')}</li>
+              <li>• {t('success.premium_benefits.contact_support')}</li>
+              <li>• {t('success.premium_benefits.manage_subscription')}</li>
             </ul>
           </div>
  
 
           {/* 联系信息 */}
           <div className="mt-12 text-center text-sm text-muted-foreground">
-            <p>如有疑问，请联系客服：support@example.com</p>
-            <p className="mt-1">工作时间：周一至周五 9:00-18:00</p>
+            <p>{t('success.support_email')}</p>
+            <p className="mt-1">{t('common.working_hours')}</p>
           </div>
         </div>
       </div>

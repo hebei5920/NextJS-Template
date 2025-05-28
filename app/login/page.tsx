@@ -35,7 +35,7 @@ export default function LoginPage() {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="glass-card p-8 rounded-lg">
           <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-          <p className="mt-4 text-muted-foreground text-center">正在加载...</p>
+          <p className="mt-4 text-muted-foreground text-center">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -52,7 +52,7 @@ export default function LoginPage() {
     try {
       await signInWithProvider(provider)
     } catch (err) {
-      setError(err instanceof Error ? err.message : '登录失败，请重试')
+      setError(err instanceof Error ? err.message : t('login.login_failed'))
     } finally {
       setIsLoading(false)
     }
@@ -77,7 +77,7 @@ export default function LoginPage() {
         >
           <ArrowLeft className="h-5 w-5" />
           <Mic className="h-6 w-6" />
-          <span className="font-semibold">返回首页</span>
+          <span className="font-semibold">{t('common.back_to_home')}</span>
         </Link>
         
         <div className="flex items-center gap-4">
@@ -97,10 +97,10 @@ export default function LoginPage() {
                 <Sparkles className="h-8 w-8 text-primary" />
               </div>
               <h1 className="text-2xl font-bold mb-2">
-                欢迎使用AI语音克隆工作室
+                {t('login.welcome_title')}
               </h1>
               <p className="text-muted-foreground">
-                选择您偏好的方式登录账户
+                {t('login.welcome_subtitle')}
               </p>
             </div>
 
@@ -123,7 +123,7 @@ export default function LoginPage() {
                 ) : (
                   <Chrome className="h-5 w-5" />
                 )}
-                使用 Google 登录
+                {t('login.google_login')}
               </button>
               
               <button
@@ -136,27 +136,27 @@ export default function LoginPage() {
                 ) : (
                   <Github className="h-5 w-5" />
                 )}
-                使用 GitHub 登录
+                {t('login.github_login')}
               </button>
             </div>
 
             {/* Features showcase */}
             <div className="space-y-3 mb-6">
               <h3 className="text-sm font-medium text-center text-muted-foreground">
-                登录后即可享受
+                {t('login.login_benefits_title')}
               </h3>
               <div className="grid grid-cols-1 gap-2 text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <div className="w-2 h-2 bg-primary rounded-full"></div>
-                  <span>AI语音克隆与生成</span>
+                  <span>{t('login.benefits.voice_cloning')}</span>
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <div className="w-2 h-2 bg-primary rounded-full"></div>
-                  <span>无限制语音文件存储</span>
+                  <span>{t('login.benefits.unlimited_storage')}</span>
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <div className="w-2 h-2 bg-primary rounded-full"></div>
-                  <span>高级语音编辑功能</span>
+                  <span>{t('login.benefits.advanced_editing')}</span>
                 </div>
               </div>
             </div>
@@ -165,13 +165,13 @@ export default function LoginPage() {
           {/* Terms and privacy */}
           <div className="mt-6 text-center text-xs text-muted-foreground">
             <p>
-              继续即表示您同意我们的
+              {t('login.terms_notice')}
               <a href="#" className="text-primary hover:text-primary/80 transition-colors mx-1">
-                服务条款
+                {t('common.terms_of_service')}
               </a>
-              和
+              {t('login.and')}
               <a href="#" className="text-primary hover:text-primary/80 transition-colors mx-1">
-                隐私政策
+                {t('common.privacy_policy')}
               </a>
             </p>
           </div>

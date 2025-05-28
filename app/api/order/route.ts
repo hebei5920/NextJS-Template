@@ -15,10 +15,10 @@ const PRODUCT_TOKEN_LIST = [
 
 
 
-// GET - 获取用户订单
+// GET - Get user orders
 export async function GET(request: NextRequest) {
   try {
-    // 验证用户身份
+    // Verify user identity
     const supabase = createClient();
     const { data: { user }, error } = await supabase.auth.getUser();
 
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 获取用户订单
+    // Get user orders
     const orders = await OrderService.getOrdersByUserId(user.id);
 
     return NextResponse.json({
@@ -46,10 +46,10 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - 创建新订单
+// POST - Create new order
 export async function POST(request: NextRequest) {
   try {
-    // 验证用户身份
+    // Verify user identity
     // const supabase = createClient();
     // const { data: { user }, error } = await supabase.auth.getUser();
 

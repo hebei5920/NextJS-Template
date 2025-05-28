@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase-server';
 import { OrderService } from '@/service/order-service';
 
-// GET - 获取单个订单
+// GET - Get single order
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // 验证用户身份
+    // Verify user identity
     const supabase = createClient();
     const { data: { user }, error } = await supabase.auth.getUser();
 
@@ -27,7 +27,7 @@ export async function GET(
       );
     }
 
-    // 获取订单
+    // Get order
     const order = await OrderService.getOrderById(orderId);
 
     if (!order) {
@@ -37,7 +37,7 @@ export async function GET(
       );
     }
 
-    // 验证订单所有权
+    // Verify order ownership
     if (order.userId !== user.id) {
       return NextResponse.json(
         { error: 'Forbidden' },
@@ -59,13 +59,13 @@ export async function GET(
   }
 }
 
-// PUT - 更新订单
+// PUT - Update order
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // 验证用户身份
+    // Verify user identity
     const supabase = createClient();
     const { data: { user }, error } = await supabase.auth.getUser();
 
@@ -84,7 +84,7 @@ export async function PUT(
       );
     }
 
-    // 获取现有订单
+    // Get existing order
     const existingOrder = await OrderService.getOrderById(orderId);
 
     if (!existingOrder) {
@@ -94,7 +94,7 @@ export async function PUT(
       );
     }
 
-    // 验证订单所有权
+    // Verify order ownership
     if (existingOrder.userId !== user.id) {
       return NextResponse.json(
         { error: 'Forbidden' },
@@ -102,7 +102,7 @@ export async function PUT(
       );
     }
 
-    // 解析请求体
+    // Parse request body
     const body = await request.json();
     const {
       price,
@@ -113,7 +113,7 @@ export async function PUT(
       status
     } = body;
 
-    // 创建更新数据
+    // Create update data
     const updateData: any = {
       updateDate: new Date()
     };
@@ -125,7 +125,7 @@ export async function PUT(
     if (payCurrency !== undefined) updateData.payCurrency = payCurrency;
     if (status !== undefined) updateData.status = status;
 
-    // 更新订单
+    // Update order
     const updatedOrder = await OrderService.updateOrder(orderId, updateData);
 
     return NextResponse.json({
@@ -142,13 +142,13 @@ export async function PUT(
   }
 }
 
-// DELETE - 删除订单
+// DELETE - Delete order
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // 验证用户身份
+    // Verify user identity
     const supabase = createClient();
     const { data: { user }, error } = await supabase.auth.getUser();
 
@@ -167,7 +167,7 @@ export async function DELETE(
       );
     }
 
-    // 获取现有订单
+    // Get existing order
     const existingOrder = await OrderService.getOrderById(orderId);
 
     if (!existingOrder) {
@@ -177,7 +177,7 @@ export async function DELETE(
       );
     }
 
-    // 验证订单所有权
+    // Verify order ownership
     if (existingOrder.userId !== user.id) {
       return NextResponse.json(
         { error: 'Forbidden' },
@@ -185,7 +185,7 @@ export async function DELETE(
       );
     }
 
-    // 删除订单
+    // Delete order
     await OrderService.deleteOrder(orderId);
 
     return NextResponse.json({

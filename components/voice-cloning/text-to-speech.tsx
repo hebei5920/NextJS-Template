@@ -89,12 +89,12 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
   // 生成语音
   const generateSpeech = async () => {
     if (!text.trim()) {
-      setError('请输入要转换的文本');
+      setError(t('components.textToSpeech.enterText'));
       return;
     }
 
     if (!voiceModel?.id) {
-      setError('语音模型未就绪，请重新创建');
+      setError(t('components.textToSpeech.modelNotReady'));
       return;
     }
 
@@ -143,7 +143,7 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || '服务器错误');
+        throw new Error(errorData.error || t('components.textToSpeech.serverError'));
       }
 
       const result = await response.json();
@@ -153,7 +153,7 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
         setGenerationResult(result.data);
         onGenerate?.(text, result.data.audioUrl);
       } else {
-        throw new Error(result.message || '语音生成失败');
+        throw new Error(result.message || t('components.textToSpeech.generationFailed'));
       }
 
     } catch (err) {
@@ -162,7 +162,7 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('生成语音时出错，请稍后重试');
+        setError(t('components.textToSpeech.generationError'));
       }
     } finally {
       setIsGenerating(false);
@@ -204,28 +204,28 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
       <div className="space-y-4">
         <div className="flex items-center gap-2 mb-3">
           <Type className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-semibold">输入要转换的文本</h3>
+          <h3 className="text-lg font-semibold">{t('components.textToSpeech.inputText')}</h3>
         </div>
 
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="请输入您想要转换为语音的文本..."
+          placeholder={t('components.textToSpeech.placeholder')}
           className="w-full h-32 p-4 border border-border rounded-lg bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
           maxLength={5000}
         />
 
         <div className="flex justify-between items-center text-sm text-muted-foreground">
-          <span>{text.length}/5000 字符</span>
+          <span>{t('components.textToSpeech.charactersCount').replace('{count}', text.length.toString())}</span>
           {!voiceModel && (
-            <span className="text-amber-600">⚠️ 请先创建语音模型</span>
+            <span className="text-amber-600">{t('components.textToSpeech.createModelFirst')}</span>
           )}
         </div>
       </div>
 
       {/* 示例文本 */}
       <div className="space-y-3">
-        <h4 className="text-sm font-medium text-muted-foreground">快速选择示例文本：</h4>
+        <h4 className="text-sm font-medium text-muted-foreground">{t('components.textToSpeech.quickSelect')}</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {exampleTexts.map((example, index) => (
             <button
@@ -243,14 +243,14 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
       <div className="border border-border rounded-lg p-4 space-y-4">
         <div className="flex items-center gap-2">
           <Settings className="h-5 w-5 text-primary" />
-          <h4 className="font-semibold">语音生成参数</h4>
+          <h4 className="font-semibold">{t('components.textToSpeech.parameters')}</h4>
         </div>
 
         {/* 基础参数 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* 音频格式 */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">音频格式</label>
+            <label className="text-sm font-medium">{t('components.textToSpeech.audioFormat')}</label>
             <select
               value={audioFormat}
               onChange={(e) => setAudioFormat(e.target.value as any)}
@@ -265,7 +265,7 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
 
           {/* 模型选择 */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">合成模型</label>
+            <label className="text-sm font-medium">{t('components.textToSpeech.model')}</label>
             <select
               value={model}
               onChange={(e) => setModel(e.target.value as any)}
@@ -280,15 +280,15 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center gap-2">
               <Globe className="h-4 w-4" />
-              语言
+              {t('components.textToSpeech.language')}
             </label>
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
               className="w-full p-2 border border-border rounded-lg bg-background"
             >
-              <option value="">自动检测</option>
-              <optgroup label="完全支持">
+              <option value="">{t('components.textToSpeech.autoDetect')}</option>
+              <optgroup label={t('components.voiceCloning.languageOptions.fullSupport')}>
                 <option value="en">English</option>
                 <option value="fr-FR">French</option>
                 <option value="de-DE">German</option>
@@ -296,7 +296,7 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
                 <option value="pt-BR">Portuguese (Brazil)</option>
                 <option value="pt-PT">Portuguese (Portugal)</option>
               </optgroup>
-              <optgroup label="Beta版本">
+              <optgroup label={t('components.voiceCloning.languageOptions.beta')}>
                 <option value="ar-AE">Arabic</option>
                 <option value="da-DK">Danish</option>
                 <option value="nl-NL">Dutch</option>
@@ -317,7 +317,7 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
               </optgroup>
             </select>
             <p className="text-xs text-muted-foreground">
-              选择特定语言可提高音质，留空则自动检测
+              {t('components.textToSpeech.languageHelper')}
             </p>
           </div>
         </div>
@@ -329,7 +329,7 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
             className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
           >
             {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            高级选项
+            {t('components.textToSpeech.advancedOptions')}
           </button>
 
           {showAdvanced && (
@@ -346,8 +346,8 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
                   className="rounded"
                 />
                 <label htmlFor="loudness_normalization" className="text-sm">
-                  <span className="font-medium">音量标准化</span>
-                  <p className="text-muted-foreground text-xs">将音频音量标准化到统一水平</p>
+                  <span className="font-medium">{t('components.textToSpeech.loudnessNormalization')}</span>
+                  <p className="text-muted-foreground text-xs">{t('components.textToSpeech.loudnessHelper')}</p>
                 </label>
               </div>
 
@@ -363,8 +363,8 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
                   className="rounded"
                 />
                 <label htmlFor="text_normalization" className="text-sm">
-                  <span className="font-medium">文本标准化</span>
-                  <p className="text-muted-foreground text-xs">将数字、日期等转换为文字形式（可能增加延迟）</p>
+                  <span className="font-medium">{t('components.textToSpeech.textNormalization')}</span>
+                  <p className="text-muted-foreground text-xs">{t('components.textToSpeech.textHelper')}</p>
                 </label>
               </div>
             </div>
@@ -382,12 +382,12 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
           {isGenerating ? (
             <>
               <Loader2 className="h-5 w-5 animate-spin" />
-              生成中...
+              {t('components.textToSpeech.generating')}
             </>
           ) : (
             <>
               <Volume2 className="h-5 w-5" />
-              生成语音
+              {t('components.textToSpeech.generateSpeech')}
             </>
           )}
         </button>
@@ -403,7 +403,7 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
             />
           </div>
           <div className="text-center text-sm text-muted-foreground">
-            正在生成语音... {progress}%
+            {t('components.textToSpeech.generatingProgress').replace('{progress}', progress.toString())}
           </div>
         </div>
       )}
@@ -413,7 +413,7 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
         <div className="border border-border rounded-lg p-6 bg-card">
           <h4 className="font-semibold mb-4 flex items-center gap-2">
             <Volume2 className="h-5 w-5 text-primary" />
-            生成的语音
+            {t('components.textToSpeech.generatedVoice')}
           </h4>
 
           <div className="space-y-4">
@@ -425,19 +425,19 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
             {/* 生成信息 */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <span className="text-muted-foreground">格式:</span>
+                <span className="text-muted-foreground">{t('components.textToSpeech.format')}:</span>
                 <span className="ml-1 font-medium">{generationResult.audioFormat.toUpperCase()}</span>
               </div>
               <div>
-                <span className="text-muted-foreground">字符数:</span>
+                <span className="text-muted-foreground">{t('components.textToSpeech.characters')}:</span>
                 <span className="ml-1 font-medium">{generationResult.billableCharacters}</span>
               </div>
               <div>
-                <span className="text-muted-foreground">模型:</span>
+                <span className="text-muted-foreground">{t('components.textToSpeech.model')}:</span>
                 <span className="ml-1 font-medium">{generationResult.model}</span>
               </div>
               <div>
-                <span className="text-muted-foreground">生成时间:</span>
+                <span className="text-muted-foreground">{t('components.textToSpeech.generationTime')}:</span>
                 <span className="ml-1 font-medium">
                   {new Date(generationResult.generatedAt).toLocaleTimeString()}
                 </span>
@@ -447,13 +447,13 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
             {/* 选项信息 */}
             {generationResult.options && Object.keys(generationResult.options).length > 0 && (
               <div className="text-sm">
-                <span className="text-muted-foreground">选项:</span>
+                <span className="text-muted-foreground">{t('components.textToSpeech.options')}:</span>
                 <div className="ml-2 mt-1 space-y-1">
                   {generationResult.options.loudness_normalization && (
-                    <div className="text-green-600">✓ 音量标准化</div>
+                    <div className="text-green-600">{t('components.textToSpeech.optionEnabled').replace('{option}', t('components.textToSpeech.loudnessNormalization'))}</div>
                   )}
                   {generationResult.options.text_normalization && (
-                    <div className="text-green-600">✓ 文本标准化</div>
+                    <div className="text-green-600">{t('components.textToSpeech.optionEnabled').replace('{option}', t('components.textToSpeech.textNormalization'))}</div>
                   )}
                 </div>
               </div>
@@ -466,7 +466,7 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
                 className="btn-secondary flex items-center gap-2"
               >
                 {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                {isPlaying ? '暂停' : '播放'}
+                {isPlaying ? t('components.textToSpeech.pause') : t('components.textToSpeech.play')}
               </button>
 
               <button
@@ -474,7 +474,7 @@ export function TextToSpeech({ voiceModel, onGenerate }: TextToSpeechProps) {
                 className="btn-secondary flex items-center gap-2"
               >
                 <Download className="h-4 w-4" />
-                下载
+                {t('components.textToSpeech.download')}
               </button>
             </div>
 

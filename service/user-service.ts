@@ -57,8 +57,8 @@ export class UserService {
       };
 
     } catch (error) {
-      console.error('Error in findOrCreateUser:', error);
-      throw new Error('用户处理失败');
+      console.error('User processing error:', error);
+      throw new Error('User processing failed');
     }
   }
 
@@ -115,7 +115,7 @@ export class UserService {
       return newUser;
     } catch (error) {
       console.error('Error creating user:', error);
-      throw new Error('创建用户失败');
+      throw new Error('Failed to create user');
     }
   }
 
@@ -151,8 +151,8 @@ export class UserService {
 
       return updatedUser;
     } catch (error) {
-      console.error('Error binding Supabase to user:', error);
-      throw new Error('绑定用户失败');
+      console.error('Error binding user:', error);
+      throw new Error('Failed to bind user');
     }
   }
 
@@ -170,8 +170,8 @@ export class UserService {
 
       return updatedUser;
     } catch (error) {
-      console.error('Error updating user login time:', error);
-      throw new Error('更新登录时间失败');
+      console.error('Error updating login time:', error);
+      throw new Error('Failed to update login time');
     }
   }
 
@@ -208,7 +208,7 @@ export class UserService {
       return updatedUser;
     } catch (error) {
       console.error('Error updating user credits:', error);
-      throw new Error('更新用户积分失败');
+      throw new Error('Failed to update user credits');
     }
   }
 
@@ -234,7 +234,7 @@ export class UserService {
       return updatedUser;
     } catch (error) {
       console.error('Error adding user credits:', error);
-      throw new Error('增加用户积分失败');
+      throw new Error('Failed to add user credits');
     }
   }
 
@@ -249,11 +249,11 @@ export class UserService {
       // 先检查用户当前积分
       const user = await this.getUserById(userId);
       if (!user) {
-        throw new Error('用户不存在');
+        throw new Error('User not found');
       }
 
       if (user.credits < formattedAmount) {
-        throw new Error('积分不足');
+        throw new Error('Insufficient credits');
       }
 
       const updatedUser = await prisma.user.update({
@@ -278,14 +278,14 @@ export class UserService {
     try {
       // 验证套餐类型
       const validPlans = ['free', 'basic', 'pro', 'enterprise'];
-      if (!plan || !validPlans.includes(plan)) {
-        throw new Error(`无效的套餐类型。必须是以下之一: ${validPlans.join(', ')}`);
+      if (!validPlans.includes(plan)) {
+        throw new Error(`Invalid plan type. Must be one of: ${validPlans.join(', ')}`);
       }
 
-      // 先检查用户是否存在
+      // Check if user exists first
       const existingUser = await this.getUserById(userId);
       if (!existingUser) {
-        throw new Error('用户不存在');
+        throw new Error('User not found');
       }
 
       // 更新用户套餐

@@ -14,12 +14,12 @@ export const GET = async (req: NextRequest) => {
       }, { status: 400 });
     }
 
-    // 从Stripe获取session详情
+    // Get session details from Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ['line_items', 'customer', 'subscription']
     });
 
-    // 验证支付状态
+    // Verify payment status
     const verificationResult = {
       id: session.id,
       status: session.status,
@@ -64,15 +64,15 @@ export const POST = async (req: NextRequest) => {
       }, { status: 400 });
     }
 
-    // 从Stripe获取session详情
+    // Get session details from Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-    // 根据支付状态返回结果
+    // Return result based on payment status
     if (session.payment_status === 'paid') {
       return NextResponse.json({
         success: true,
         status: 'completed',
-        message: '支付已完成',
+        message: 'Payment completed successfully',
         data: {
           sessionId: session.id,
           amount: session.amount_total,
@@ -84,7 +84,7 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({
         success: false,
         status: session.payment_status,
-        message: '支付未完成或失败'
+        message: 'Payment not completed or failed'
       });
     }
 

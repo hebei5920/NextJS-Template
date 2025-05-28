@@ -3,10 +3,10 @@ import { createClient } from '@/lib/supabase-server';
 import { UserService } from '@/service/user-service';
 import { formatCredits } from '@/lib/utils';
 
-// GET - 获取用户积分信息
+// GET - Get user credits information
 export async function GET() {
   try {
-    // 验证用户身份
+    // Verify user identity
     const supabase = createClient();
     const { data: { user }, error } = await supabase.auth.getUser();
 
@@ -19,7 +19,7 @@ export async function GET() {
     console.log("user",user);
     
 
-    // 获取用户信息
+    // Get user information
     const userInfo = await UserService.getUserBySupabaseId(user.id);
     
     if (!userInfo) {
@@ -44,10 +44,10 @@ export async function GET() {
   }
 }
 
-// POST - 管理用户积分（增加、扣减、设置）
+// POST - Manage user credits (add, deduct, set)
 export async function POST(request: NextRequest) {
   try {
-    // 验证用户身份
+    // Verify user identity
     const supabase = createClient();
     const { data: { user }, error } = await supabase.auth.getUser();
 
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 获取用户信息
+    // Get user information
     const userInfo = await UserService.getUserBySupabaseId(user.id);
     
     if (!userInfo) {
@@ -68,11 +68,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 解析请求体
+    // Parse request body
     const body = await request.json();
     const { action, amount } = body;
 
-    // 验证输入
+    // Validate input
     if (!action || !['add', 'deduct', 'set'].includes(action)) {
       return NextResponse.json(
         { error: 'Invalid action. Must be "add", "deduct", or "set"' }, 

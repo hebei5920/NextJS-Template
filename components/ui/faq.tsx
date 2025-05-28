@@ -2,49 +2,52 @@
 
 import { useState } from 'react';
 import { ChevronDown, ChevronRight, HelpCircle } from 'lucide-react';
+import { useTranslation } from '@/providers/language-provider';
 
 interface FAQItem {
   question: string;
   answer: string;
 }
 
-const faqData: FAQItem[] = [
-  {
-    question: "需要多长时间的音频样本来克隆我的声音？",
-    answer: "我们的AI技术只需要3-10秒的清晰音频样本就能有效地克隆您的声音。为了获得最佳效果，建议提供高质量、无背景噪音的录音。"
-  },
-  {
-    question: "生成的语音质量如何？",
-    answer: "我们使用最先进的AI模型，能够生成接近真实人声的高质量音频。生成的语音保持了原始声音的音色、语调和语速特征。"
-  },
-  {
-    question: "我的声音数据是否安全？",
-    answer: "绝对安全。我们采用企业级加密技术保护您的数据，所有音频文件都经过加密存储，且仅用于您授权的用途。我们承诺不会将您的声音数据用于其他目的。"
-  },
-  {
-    question: "支持哪些语言？",
-    answer: "目前我们支持中文（普通话）、英语、日语、韩语等多种语言。我们的AI模型能够识别并保持原语言的语音特征。"
-  },
-  {
-    question: "生成的音频可以用于商业用途吗？",
-    answer: "是的，根据我们的服务条款，您可以将生成的音频用于个人和商业用途。但请确保遵守当地法律法规，并在必要时告知听众这是AI生成的内容。"
-  },
-  {
-    question: "如何取消订阅？",
-    answer: "您可以随时在账户设置中取消订阅。取消后，您仍可以使用服务直到当前计费周期结束，之后将自动转为免费计划。"
-  },
-  {
-    question: "免费计划有什么限制？",
-    answer: "免费计划每月可以生成最多5分钟的音频内容，支持基本的语音克隆功能。付费计划提供更多生成时长、高级功能和优先处理。"
-  },
-  {
-    question: "生成失败了怎么办？",
-    answer: "如果生成失败，请检查音频质量是否清晰、文本是否过长。您也可以联系我们的客服团队，我们会尽快帮助您解决问题。"
-  }
-];
-
 export function FAQ() {
+  const { t } = useTranslation();
   const [openItems, setOpenItems] = useState<Set<number>>(new Set());
+
+  // 获取本地化的FAQ数据
+  const getFAQData = (): FAQItem[] => [
+    {
+      question: t('components.faq.questions.q1.question'),
+      answer: t('components.faq.questions.q1.answer')
+    },
+    {
+      question: t('components.faq.questions.q2.question'),
+      answer: t('components.faq.questions.q2.answer')
+    },
+    {
+      question: t('components.faq.questions.q3.question'),
+      answer: t('components.faq.questions.q3.answer')
+    },
+    {
+      question: t('components.faq.questions.q4.question'),
+      answer: t('components.faq.questions.q4.answer')
+    },
+    {
+      question: t('components.faq.questions.q5.question'),
+      answer: t('components.faq.questions.q5.answer')
+    },
+    {
+      question: t('components.faq.questions.q6.question'),
+      answer: t('components.faq.questions.q6.answer')
+    },
+    {
+      question: t('components.faq.questions.q7.question'),
+      answer: t('components.faq.questions.q7.answer')
+    },
+    {
+      question: t('components.faq.questions.q8.question'),
+      answer: t('components.faq.questions.q8.answer')
+    }
+  ];
 
   const toggleItem = (index: number) => {
     const newOpenItems = new Set(openItems);
@@ -65,15 +68,15 @@ export function FAQ() {
           </div>
         </div>
         <h2 className="text-3xl md:text-4xl font-bold mb-4">
-          常见问题
+          {t('components.faq.title')}
         </h2>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          为您解答使用AI语音克隆过程中的常见疑问
+          {t('components.faq.description')}
         </p>
       </div>
 
       <div className="space-y-4">
-        {faqData.map((item, index) => (
+        {getFAQData().map((item, index) => (
           <div
             key={index}
             className="glass-card border border-border rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md"
@@ -105,15 +108,15 @@ export function FAQ() {
 
       <div className="mt-12 text-center">
         <div className="glass-card p-6">
-          <h3 className="text-xl font-semibold mb-3">还有其他问题？</h3>
+          <h3 className="text-xl font-semibold mb-3">{t('components.faq.contactSection.title')}</h3>
           <p className="text-muted-foreground mb-4">
-            如果您有其他疑问，欢迎联系我们的客服团队
+            {t('components.faq.contactSection.description')}
           </p>
           <a
             href="mailto:support@aivoice.com"
             className="btn-primary inline-flex items-center gap-2"
           >
-            联系客服
+            {t('components.faq.contactSection.contactButton')}
           </a>
         </div>
       </div>

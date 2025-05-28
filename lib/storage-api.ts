@@ -25,7 +25,7 @@ export class StorageAPI {
     const result: StorageAPIResponse<MediaUploadResult> = await response.json()
 
     if (!result.success || !result.data) {
-      throw new Error(result.error || '上传失败')
+      throw new Error(result.error || 'Upload failed')
     }
 
     return result.data
@@ -47,7 +47,7 @@ export class StorageAPI {
     const result: StorageAPIResponse<MediaFileInfo[]> = await response.json()
 
     if (!result.success || !result.data) {
-      throw new Error(result.error || '获取文件列表失败')
+      throw new Error(result.error || 'Failed to get file list')
     }
 
     return result.data
@@ -68,7 +68,7 @@ export class StorageAPI {
     const result: StorageAPIResponse<{ url?: string; downloadUrl?: string }> = await response.json()
 
     if (!result.success || !result.data) {
-      throw new Error(result.error || '获取下载链接失败')
+      throw new Error(result.error || 'Failed to get download link')
     }
 
     return result.data.downloadUrl || result.data.url || ''
@@ -87,7 +87,7 @@ export class StorageAPI {
     const result: StorageAPIResponse = await response.json()
 
     if (!result.success) {
-      throw new Error(result.error || '删除文件失败')
+      throw new Error(result.error || 'Failed to delete file')
     }
   }
 
@@ -106,7 +106,7 @@ export class StorageAPI {
     const result: StorageAPIResponse<{ success: string[]; failed: string[] }> = await response.json()
 
     if (!result.success || !result.data) {
-      throw new Error(result.error || '批量删除失败')
+      throw new Error(result.error || 'Batch delete failed')
     }
 
     return result.data
@@ -121,7 +121,7 @@ export class StorageAPI {
       
       const response = await fetch(downloadUrl)
       if (!response.ok) {
-        throw new Error('下载失败')
+        throw new Error('Download failed')
       }
 
       const blob = await response.blob()
@@ -136,7 +136,7 @@ export class StorageAPI {
       
       window.URL.revokeObjectURL(url)
     } catch (error) {
-      throw new Error(error instanceof Error ? error.message : '下载失败')
+      throw new Error(error instanceof Error ? error.message : 'Download failed')
     }
   }
 
@@ -193,7 +193,7 @@ export class StorageAPI {
     if (!supportedTypes.includes(file.type)) {
       return {
         isValid: false,
-        error: `不支持的文件类型: ${file.type}`
+        error: `Unsupported file type: ${file.type}`
       }
     }
 
@@ -220,7 +220,7 @@ export class StorageAPI {
     } else {
       return {
         isValid: false,
-        error: '未知的文件类型'
+        error: 'Unknown file type'
       }
     }
 
@@ -228,7 +228,7 @@ export class StorageAPI {
       const limitMB = Math.round(limit / (1024 * 1024))
       return {
         isValid: false,
-        error: `文件大小不能超过 ${limitMB}MB`
+        error: `File size cannot exceed ${limitMB}MB`
       }
     }
 

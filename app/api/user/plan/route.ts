@@ -3,10 +3,10 @@ import { createClient } from '@/lib/supabase-server';
 import { UserService } from '@/service/user-service';
 import { formatCredits } from '@/lib/utils';
 
-// GET - 获取用户套餐信息
+// GET - Get user plan information
 export async function GET() {
   try {
-    // 验证用户身份
+    // Verify user identity
     const supabase = createClient();
     const { data: { user }, error } = await supabase.auth.getUser();
 
@@ -17,7 +17,7 @@ export async function GET() {
       );
     }
 
-    // 获取用户信息
+    // Get user information
     const userInfo = await UserService.getUserBySupabaseId(user.id);
     
     if (!userInfo) {
@@ -42,10 +42,10 @@ export async function GET() {
   }
 }
 
-// POST - 更新用户套餐
+// POST - Update user plan
 export async function POST(request: NextRequest) {
   try {
-    // 验证用户身份
+    // Verify user identity
     const supabase = createClient();
     const { data: { user }, error } = await supabase.auth.getUser();
 
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 获取用户信息
+    // Get user information
     const userInfo = await UserService.getUserBySupabaseId(user.id);
     
     if (!userInfo) {
@@ -66,11 +66,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 解析请求体
+    // Parse request body
     const body = await request.json();
     const { plan } = body;
 
-    // 验证套餐类型
+    // Validate plan type
     const validPlans = ['free', 'basic', 'pro', 'enterprise'];
     if (!plan || !validPlans.includes(plan)) {
       return NextResponse.json(
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      // 使用 UserService 的 updateUserPlan 方法
+      // Use UserService's updateUserPlan method
       const updatedUser = await UserService.updateUserPlan(userInfo.id, plan);
 
       return NextResponse.json({ 

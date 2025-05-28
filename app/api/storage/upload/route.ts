@@ -4,13 +4,13 @@ import { createClient } from '@/lib/supabase-server'
 
 export async function POST(request: NextRequest) {
   try {
-    // 检查用户认证
+    // Check user authentication
     const supabase = createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json(
-        { error: '未认证用户' },
+        { error: 'Unauthenticated user' },
         { status: 401 }
       )
     }
@@ -22,15 +22,15 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       return NextResponse.json(
-        { error: '未提供文件' },
+        { error: 'No file provided' },
         { status: 400 }
       )
     }
 
-    // 创建服务端媒体服务实例
+    // Create server-side media service instance
     const serverMediaService = createServerMediaService()
 
-    // 验证文件类型和大小
+    // Validate file type and size
     const validation = serverMediaService.validateFile(file)
     if (!validation.isValid) {
       return NextResponse.json(
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 上传文件
+    // Upload file
     const result = await serverMediaService.uploadMedia({
       file,
       userId: user.id,
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Upload error:', error)
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : '上传失败' },
+      { error: error instanceof Error ? error.message : 'Upload failed' },
       { status: 500 }
     )
   }
@@ -62,13 +62,13 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // 检查用户认证
+    // Check user authentication
     const supabase = createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json(
-        { error: '未认证用户' },
+        { error: 'Unauthenticated user' },
         { status: 401 }
       )
     }
@@ -76,10 +76,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const bucket = searchParams.get('bucket') || 'media'
 
-    // 创建服务端媒体服务实例
+    // Create server-side media service instance
     const serverMediaService = createServerMediaService()
 
-    // 获取用户的所有媒体文件
+    // Get all user's media files
     const mediaFiles = await serverMediaService.getUserMediaFiles(user.id, bucket)
 
     return NextResponse.json({
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Get files error:', error)
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : '获取文件列表失败' },
+      { error: error instanceof Error ? error.message : 'Failed to get file list' },
       { status: 500 }
     )
   }

@@ -4,9 +4,9 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// Speechify支持的语言列表
+// Speechify supported languages list
 const SUPPORTED_LANGUAGES = {
-  // 完全支持的语言
+  // Fully supported languages
   'en': 'English',
   'fr-FR': 'French',
   'de-DE': 'German', 
@@ -14,7 +14,7 @@ const SUPPORTED_LANGUAGES = {
   'pt-BR': 'Portuguese (Brazil)',
   'pt-PT': 'Portuguese (Portugal)',
   
-  // Beta语言
+  // Beta languages
   'ar-AE': 'Arabic',
   'da-DK': 'Danish',
   'nl-NL': 'Dutch',
@@ -37,7 +37,7 @@ const SUPPORTED_LANGUAGES = {
 export async function POST(request: NextRequest) {
  
     try {
-        // 验证用户身份
+        // Verify user identity
         const supabase = createClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -48,16 +48,16 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 获取用户的完整信息用于fullName
+        // Get user's full information for fullName
         let userFullName = '';
         
-        // 尝试从用户元数据获取姓名
+        // Try to get name from user metadata
         if (user.user_metadata?.full_name) {
             userFullName = user.user_metadata.full_name;
         } else if (user.user_metadata?.name) {
             userFullName = user.user_metadata.name;
         } else {
-            // 从profiles表获取用户信息
+            // Get user information from profiles table
             try {
                 const { data: profile } = await supabase
                     .from('profiles')
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // 如果仍然没有获取到姓名，使用邮箱前缀作为默认值
+        // If still no name is obtained, use email prefix as default
         if (!userFullName && user.email) {
             userFullName = user.email.split('@')[0];
         }
@@ -88,9 +88,9 @@ export async function POST(request: NextRequest) {
         const gender = formData.get('gender') as string;
         const sample = formData.get('sample') as File;
         const avatar = formData.get('avatar') as File;
-        const language = formData.get('language') as string || 'en'; // 默认英语
+        const language = formData.get('language') as string || 'en'; // Default English
 
-        // 输入验证
+        // Input validation
         if (!name || typeof name !== 'string') {
             return NextResponse.json(
                 { error: 'Name is required and must be a string' },
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 验证语言代码
+        // Validate language code
         if (language && !SUPPORTED_LANGUAGES[language as keyof typeof SUPPORTED_LANGUAGES]) {
             return NextResponse.json(
                 { error: `Unsupported language. Supported languages: ${Object.keys(SUPPORTED_LANGUAGES).join(', ')}` },
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 构建 consent 对象，使用从用户信息中获取的fullName
+        // Build consent object, using fullName obtained from user information
         const consent = JSON.stringify({
             fullName: userFullName || 'Unknown User',
             email: user.email || '',
@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
             agreed: true
         });
 
-        // 检查环境变量
+        // Check environment variables
         const speechifyToken = process.env.SPEECHIFY_KEY;
         if (!speechifyToken) {
             return NextResponse.json(
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 准备发送到 Speechify API 的表单数据
+        // Prepare form data to send to Speechify API
         const speechifyFormData = new FormData();
         speechifyFormData.append('name', name);
         speechifyFormData.append('gender', gender);
@@ -152,12 +152,12 @@ export async function POST(request: NextRequest) {
         speechifyFormData.append('avatar', avatar);
         speechifyFormData.append('consent', consent);
         
-        // 如果指定了语言，添加到请求中
+        // If language is specified, add it to the request
         if (language && language !== 'en') {
             speechifyFormData.append('language', language);
         }
 
-        // 调用 Speechify API
+        // Call Speechify API
         const speechifyResponse = await fetch('https://api.sws.speechify.com/v1/voices', {
             method: 'POST',
             headers: {
@@ -182,12 +182,12 @@ export async function POST(request: NextRequest) {
 
         const speechifyResult = await speechifyResponse.json();
 
-        // 保存语音模型到数据库
+        // Save voice model to database
         try {
             const voiceModel = await prisma.voiceModel.create({
                 data: {
                     modelId: speechifyResult.id,
-                    userId: user.id, // 用户的supabaseId
+                    userId: user.id, // User's supabaseId
                     gender: speechifyResult.gender || gender,
                     locale: speechifyResult.locale || language,
                     displayName: speechifyResult.display_name || name,
@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
             console.log('Voice model saved to database:', voiceModel);
         } catch (dbError) {
             console.error('Failed to save voice model to database:', dbError);
-            // 即使数据库保存失败，也返回成功响应，因为语音模型已在Speechify创建成功
+            // Return success response even if database save fails, as voice model was successfully created in Speechify
         }
 
         return NextResponse.json({
@@ -228,7 +228,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
     try {
-        // 验证用户身份
+        // Verify user identity
         const supabase = createClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -239,7 +239,7 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // 检查环境变量
+        // Check environment variables
         const speechifyToken = process.env.SPEECHIFY_KEY;
         if (!speechifyToken) {
             return NextResponse.json(
@@ -248,7 +248,7 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // 获取用户的语音列表
+        // Get user's voice list
         const speechifyResponse = await fetch('https://api.sws.speechify.com/v1/voices', {
             method: 'GET',
             headers: {

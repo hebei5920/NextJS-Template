@@ -4,7 +4,7 @@ import { AuthService } from '@/service/auth-service'
 
 export async function GET() {
   try {
-    // 获取当前 Supabase 用户
+    // Get current Supabase user
     const supabase = createClient()
     const { data: { user }, error } = await supabase.auth.getUser()
 
@@ -15,7 +15,7 @@ export async function GET() {
       )
     }
 
-    // 获取数据库中的用户信息
+    // Get user information from database
     const userInfo = await AuthService.getUserInfo(user.id)
 
     if (!userInfo) {

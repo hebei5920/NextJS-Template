@@ -7,12 +7,12 @@ const PRICE_ID_LIST = [
     { 
         key: 'pro', 
         monthly: 'price_1RQMR0Psq011JgrIqqzrzjPR',
-        yearly: 'price_1RQMR0Psq011JgrIqqzrzjPR_yearly' // 需要在Stripe控制台创建年付价格
+        yearly: 'price_1RQMR0Psq011JgrIqqzrzjPR_yearly' // Need to create yearly price in Stripe console
     },
     { 
         key: 'enterprise', 
         monthly: 'price_1RQMRLPsq011JgrImNCwJTre',
-        yearly: 'price_1RQMRLPsq011JgrImNCwJTre_yearly' // 需要在Stripe控制台创建年付价格
+        yearly: 'price_1RQMRLPsq011JgrImNCwJTre_yearly' // Need to create yearly price in Stripe console
     },
 ]
 

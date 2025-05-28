@@ -103,7 +103,7 @@ export function AudioRecorder({ onRecordingComplete, minDuration = 3 }: AudioRec
       }, 100);
       
     } catch (err) {
-      setError('无法访问麦克风，请确保已授予权限');
+      setError(t('components.audioRecorder.microphoneAccessError'));
       console.error('Error accessing microphone:', err);
     }
   };
@@ -215,12 +215,12 @@ export function AudioRecorder({ onRecordingComplete, minDuration = 3 }: AudioRec
         </div>
         {duration > 0 && duration < minDuration && (
           <div className="text-sm text-muted-foreground">
-            至少需要录制 {minDuration} 秒
+            {t('components.audioRecorder.minDurationRequired').replace('{minDuration}', minDuration.toString())}
           </div>
         )}
         {duration >= minDuration && (
           <div className="text-sm text-green-600">
-            ✓ 录音时长符合要求
+            {t('components.audioRecorder.durationValid')}
           </div>
         )}
       </div>
@@ -238,7 +238,7 @@ export function AudioRecorder({ onRecordingComplete, minDuration = 3 }: AudioRec
             className="btn-primary flex items-center gap-2"
           >
             <Mic className="h-5 w-5" />
-            开始录音
+            {t('components.audioRecorder.startRecording')}
           </button>
         )}
 
@@ -248,7 +248,7 @@ export function AudioRecorder({ onRecordingComplete, minDuration = 3 }: AudioRec
             className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 recording-pulse"
           >
             <Square className="h-5 w-5" />
-            停止录音
+            {t('components.audioRecorder.stopRecording')}
           </button>
         )}
 
@@ -259,7 +259,7 @@ export function AudioRecorder({ onRecordingComplete, minDuration = 3 }: AudioRec
               className="btn-secondary flex items-center gap-2"
             >
               {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-              {isPlaying ? '暂停' : '播放'}
+              {isPlaying ? t('components.audioRecorder.pause') : t('components.audioRecorder.play')}
             </button>
             
             <button
@@ -267,7 +267,7 @@ export function AudioRecorder({ onRecordingComplete, minDuration = 3 }: AudioRec
               className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center gap-2"
             >
               <Trash2 className="h-5 w-5" />
-              删除
+              {t('components.audioRecorder.delete')}
             </button>
             
             {duration >= minDuration && (
@@ -276,7 +276,7 @@ export function AudioRecorder({ onRecordingComplete, minDuration = 3 }: AudioRec
                 className="btn-primary flex items-center gap-2"
               >
                 <Upload className="h-5 w-5" />
-                使用录音
+                {t('components.audioRecorder.useRecording')}
               </button>
             )}
           </>

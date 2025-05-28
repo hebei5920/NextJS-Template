@@ -58,7 +58,7 @@ export function VoiceModelsHistory() {
       
       // 检查日期是否有效
       if (isNaN(date.getTime())) {
-        return '日期无效';
+        return t('components.voiceModels.dateFormatting.invalidDate');
       }
       
       const now = new Date();
@@ -72,11 +72,11 @@ export function VoiceModelsHistory() {
       const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
        
       if (diffDays === 0) {
-        return '今天';
+        return t('components.voiceModels.dateFormatting.today');
       } else if (diffDays === 1) {
-        return '昨天';
+        return t('components.voiceModels.dateFormatting.yesterday');
       } else if (diffDays < 7) {
-        return `${diffDays}天前`;
+        return t('components.voiceModels.dateFormatting.daysAgo').replace('{days}', diffDays.toString());
       } else {
         return date.toLocaleDateString('zh-CN', {
           year: 'numeric',
@@ -86,7 +86,7 @@ export function VoiceModelsHistory() {
       }
     } catch (error) {
       console.error('Date formatting error:', error);
-      return '日期格式错误';
+      return t('components.voiceModels.dateFormatting.formatError');
     }
   };
 
@@ -101,10 +101,10 @@ export function VoiceModelsHistory() {
   // 删除模型
   const deleteModel = async (modelId: string, modelName: string) => {
     showConfirm({
-      title: '删除语音模型',
-      description: `确定要删除语音模型"${modelName}"吗？删除后将无法恢复。`,
-      confirmText: '删除',
-      cancelText: '取消',
+      title: t('components.voiceModels.deleteConfirmTitle'),
+      description: t('components.voiceModels.deleteConfirmDescription').replace('{modelName}', modelName),
+      confirmText: t('components.voiceModels.delete'),
+      cancelText: t('components.voiceModels.cancel'),
       type: 'danger',
       icon: <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />,
       onConfirm: async () => {
@@ -124,22 +124,22 @@ export function VoiceModelsHistory() {
             setVoiceModels(prev => prev.filter(model => model.modelId !== modelId));
             // 显示成功提示
             showToast({
-              title: '删除成功',
-              description: `语音模型"${modelName}"已成功删除`,
+              title: t('components.voiceModels.deleteSuccess'),
+              description: t('components.voiceModels.deleteSuccessDescription').replace('{modelName}', modelName),
               type: 'success'
             });
           } else {
             showToast({
-              title: '删除失败',
-              description: result.error || '删除失败，请重试',
+              title: t('components.voiceModels.deleteFailed'),
+              description: result.error || t('components.voiceModels.deleteFailedDescription'),
               type: 'error'
             });
           }
         } catch (error) {
           console.error('Failed to delete model:', error);
           showToast({
-            title: '删除失败',
-            description: '网络连接错误，请检查后重试',
+            title: t('components.voiceModels.deleteFailed'),
+            description: t('components.voiceModels.networkError'),
             type: 'error'
           });
         }
@@ -173,27 +173,27 @@ export function VoiceModelsHistory() {
           <div className="text-3xl font-bold text-primary mb-2">
             {voiceModels.length}
           </div>
-          <div className="text-sm text-muted-foreground">总模型数</div>
+          <div className="text-sm text-muted-foreground">{t('components.voiceModels.totalModels')}</div>
         </div>
         <div className="glass-card p-6 text-center">
           <div className="text-3xl font-bold text-primary mb-2">
             {voiceModels.filter(m => m.gender === 'male').length}
           </div>
-          <div className="text-sm text-muted-foreground">男声模型</div>
+          <div className="text-sm text-muted-foreground">{t('components.voiceModels.maleModels')}</div>
         </div>
         <div className="glass-card p-6 text-center">
           <div className="text-3xl font-bold text-primary mb-2">
             {voiceModels.filter(m => m.gender === 'female').length}
           </div>
-          <div className="text-sm text-muted-foreground">女声模型</div>
+          <div className="text-sm text-muted-foreground">{t('components.voiceModels.femaleModels')}</div>
         </div>
       </div>
 
       {/* 模型列表 */}
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold">我的语音模型</h3>
+        <h3 className="text-xl font-semibold">{t('components.voiceModels.myVoiceModels')}</h3>
         <div className="text-sm text-muted-foreground">
-          {voiceModels.length} 个模型
+          {voiceModels.length} {t('components.voiceModels.modelsCount')}
         </div>
       </div>
 
@@ -202,12 +202,12 @@ export function VoiceModelsHistory() {
       ) : voiceModels.length === 0 ? (
         <div className="text-center py-16">
           <User className="h-16 w-16 text-muted-foreground mx-auto mb-6" />
-          <h3 className="text-xl font-medium mb-3">暂无语音模型</h3>
+          <h3 className="text-xl font-medium mb-3">{t('components.voiceModels.noModels')}</h3>
           <p className="text-muted-foreground mb-6">
-            创建您的第一个AI语音模型，开始个性化语音生成之旅
+            {t('components.voiceModels.noModelsDescription')}
           </p>
           <button className="btn-primary">
-            创建语音模型
+            {t('components.voiceModels.createModel')}
           </button>
         </div>
       ) : (
@@ -235,7 +235,7 @@ export function VoiceModelsHistory() {
                         ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
                         : 'bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300'
                     }`}>
-                      {model.gender === 'male' ? '男声' : '女声'}
+                      {model.gender === 'male' ? t('components.voiceModels.male') : t('components.voiceModels.female')}
                     </span>
                     {model.locale && (
                       <span className="text-xs px-2 py-1 bg-muted rounded-full">
@@ -250,10 +250,10 @@ export function VoiceModelsHistory() {
               <div className="space-y-2 mb-4">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Calendar className="h-4 w-4" />
-                  <span>创建于 {formatDate(model.createDate)}</span>
+                  <span>{t('components.voiceModels.createdOn')} {formatDate(model.createDate)}</span>
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  模型ID: {model.modelId}
+                  {t('components.voiceModels.modelId')}: {model.modelId}
                 </div>
               </div>
 
@@ -264,12 +264,12 @@ export function VoiceModelsHistory() {
                   className="flex-1 btn-secondary text-sm flex items-center justify-center gap-1"
                 >
                   <Play className="h-4 w-4" />
-                  使用
+                  {t('components.voiceModels.use')}
                 </button>
                 <button
                   onClick={() => deleteModel(model.modelId, model.displayName)}
                   className="text-red-500 hover:text-red-700 p-2 rounded transition-colors"
-                  title="删除模型"
+                  title={t('components.voiceModels.deleteModel')}
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

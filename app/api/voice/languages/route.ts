@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
-// Speechify支持的语言列表
+// Speechify supported languages list
 const SUPPORTED_LANGUAGES = {
-  // 完全支持的语言
+  // Fully supported languages
   'en': { name: 'English', status: 'fully_supported' },
   'fr-FR': { name: 'French', status: 'fully_supported' },
   'de-DE': { name: 'German', status: 'fully_supported' },
@@ -10,7 +10,7 @@ const SUPPORTED_LANGUAGES = {
   'pt-BR': { name: 'Portuguese (Brazil)', status: 'fully_supported' },
   'pt-PT': { name: 'Portuguese (Portugal)', status: 'fully_supported' },
   
-  // Beta语言
+  // Beta languages
   'ar-AE': { name: 'Arabic', status: 'beta' },
   'da-DK': { name: 'Danish', status: 'beta' },
   'nl-NL': { name: 'Dutch', status: 'beta' },

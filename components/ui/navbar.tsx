@@ -8,8 +8,10 @@ import { Sparkles, User, LogIn, LogOut, History, Mic } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useVoiceModel } from '@/providers/voice-model-provider';
+import { useTranslation } from '@/providers/language-provider';
 
 export function Navbar() {
+  const { t } = useTranslation();
   const { user, loading, signOut } = useAuth();
   const { selectedVoiceModel, clearSelectedVoiceModel } = useVoiceModel();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,14 +34,14 @@ export function Navbar() {
 
   // 处理退出登录确认
   const handleSignOut = () => {
-    if (window.confirm('确定要退出登录吗？')) {
+    if (window.confirm(t('nav.logoutConfirm'))) {
       signOut();
     }
   };
 
   // 处理移动端退出登录确认
   const handleMobileSignOut = () => {
-    if (window.confirm('确定要退出登录吗？')) {
+    if (window.confirm(t('nav.logoutConfirm'))) {
       signOut();
       setIsMenuOpen(false);
     }
@@ -56,7 +58,7 @@ export function Navbar() {
                 <Sparkles className="h-5 w-5 text-primary-foreground" />
               </div>
               <span className="bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                AI语音克隆
+                {t('nav.appTitle')}
               </span>
             </Link>
           </div>
@@ -67,31 +69,31 @@ export function Navbar() {
               onClick={() => scrollToSection('studio')}
               className="text-foreground hover:text-primary font-medium"
             >
-              克隆
+              {t('nav.clone')}
             </button>
             <button
               onClick={() => scrollToSection('pricing')}
               className="text-foreground hover:text-primary font-medium"
             >
-              定价
+              {t('nav.pricing')}
             </button>
             <button
               onClick={() => scrollToSection('faq')}
               className="text-foreground hover:text-primary font-medium"
             >
-              常见问题
+              {t('nav.faq')}
             </button>
             <Link
               href="/models"
               className="text-foreground hover:text-primary font-medium"
             >
-              语音模型
+              {t('nav.voiceModels')}
             </Link>
             <Link
               href="/history"
               className="text-foreground hover:text-primary font-medium"
             >
-              生成历史
+              {t('nav.generationHistory')}
             </Link>
           </div>
 
@@ -128,7 +130,7 @@ export function Navbar() {
                   <button
                     onClick={handleSignOut}
                     className="flex items-center gap-1 text-sm px-2 py-1.5 rounded-md hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/10 transition-colors duration-200"
-                    title="退出登录"
+                    title={t('nav.logout')}
                   >
                     <LogOut className="h-4 w-4" />
                   </button>
@@ -139,7 +141,7 @@ export function Navbar() {
                   className="flex items-center gap-2 text-sm px-4 py-2 rounded-md border border-border bg-background hover:bg-accent text-foreground transition-colors duration-200"
                 >
                   <LogIn className="h-4 w-4" />
-                  <span>登录</span>
+                  <span>{t('nav.login')}</span>
                 </Link>
               )}
             </div>
@@ -155,19 +157,19 @@ export function Navbar() {
                 onClick={() => scrollToSection('studio')}
                 className="block w-full text-left px-3 py-2 text-foreground hover:text-primary hover:bg-accent rounded-md transition-colors duration-200"
               >
-                克隆
+                {t('nav.clone')}
               </button>
               <button
                 onClick={() => scrollToSection('pricing')}
                 className="block w-full text-left px-3 py-2 text-foreground hover:text-primary hover:bg-accent rounded-md transition-colors duration-200"
               >
-                定价
+                {t('nav.pricing')}
               </button>
               <button
                 onClick={() => scrollToSection('faq')}
                 className="block w-full text-left px-3 py-2 text-foreground hover:text-primary hover:bg-accent rounded-md transition-colors duration-200"
               >
-                常见问题
+                {t('nav.faq')}
               </button>
               <Link
                 href="/models"
@@ -175,7 +177,7 @@ export function Navbar() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 <User className="h-4 w-4" />
-                语音模型
+                {t('nav.voiceModels')}
               </Link>
               <Link
                 href="/history"
@@ -183,7 +185,7 @@ export function Navbar() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 <History className="h-4 w-4" />
-                生成历史
+                {t('nav.generationHistory')}
               </Link>
 
               {/* Mobile Voice Model Indicator */}
@@ -193,7 +195,7 @@ export function Navbar() {
                     <div className="flex items-center gap-2">
                       <Mic className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium text-primary">
-                        当前模型: {selectedVoiceModel.displayName}
+                        {t('nav.currentModel')}: {selectedVoiceModel.displayName}
                       </span>
                     </div>
                     <button
@@ -202,9 +204,9 @@ export function Navbar() {
                         setIsMenuOpen(false);
                       }}
                       className="text-primary/60 hover:text-primary text-sm px-2 py-1 rounded"
-                      title="清除选择"
+                      title={t('nav.clearSelection')}
                     >
-                      清除
+                      {t('nav.clear')}
                     </button>
                   </div>
                 </div>
@@ -214,7 +216,7 @@ export function Navbar() {
               <div className="border-t border-border pt-2 mt-2 space-y-2">
                 {/* Language and Theme Switchers for Mobile */}
                 <div className="flex items-center justify-between px-3 py-2">
-                  <span className="text-sm text-muted-foreground">设置</span>
+                  <span className="text-sm text-muted-foreground">{t('nav.settings')}</span>
                   <div className="flex items-center gap-2">
                     <LanguageSwitcher />
                     <ThemeSwitcher />
@@ -242,7 +244,7 @@ export function Navbar() {
                       className="flex items-center gap-2 w-full px-3 py-2 text-sm rounded-md border border-border bg-background hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:hover:bg-red-900/10 dark:hover:border-red-800 transition-colors duration-200"
                     >
                       <LogOut className="h-4 w-4" />
-                      <span>退出</span>
+                      <span>{t('nav.logoutShort')}</span>
                     </button>
                   </div>
                 ) : (
@@ -252,7 +254,7 @@ export function Navbar() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <LogIn className="h-4 w-4" />
-                    <span>登录</span>
+                    <span>{t('nav.login')}</span>
                   </Link>
                 )}
               </div>

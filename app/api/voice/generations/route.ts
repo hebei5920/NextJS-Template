@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   try {
-    // 验证用户身份
+    // Verify user identity
     const supabase = createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 获取查询参数
+    // Get query parameters
     const { searchParams } = new URL(request.url);
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
     const modelId = searchParams.get('modelId');
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     let voiceGenerations;
     
     if (modelId) {
-      // 获取特定模型的语音生成历史
+      // Get voice generation history for specific model
       voiceGenerations = await prisma.voice.findMany({
         where: {
           userId: user.id,
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
         }
       });
     } else {
-      // 获取用户的所有语音生成历史
+      // Get all user's voice generation history
       voiceGenerations = await prisma.voice.findMany({
         where: {
           userId: user.id
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    // 验证用户身份
+    // Verify user identity
     const supabase = createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -98,7 +98,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // 获取请求体
+    // Get request body
     const body = await request.json();
     const { voiceId } = body;
 
@@ -109,7 +109,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // 删除语音生成记录
+    // Delete voice generation record
     await prisma.voice.delete({
       where: {
         id: voiceId,

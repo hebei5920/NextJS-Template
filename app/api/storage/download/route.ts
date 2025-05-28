@@ -4,13 +4,13 @@ import { createClient } from '@/lib/supabase-server'
 
 export async function GET(request: NextRequest) {
   try {
-    // 检查用户认证
+    // Check user authentication
     const supabase = createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     
     if (authError || !user) {
       return NextResponse.json(
-        { error: '未认证用户' },
+        { error: 'Unauthenticated user' },
         { status: 401 }
       )
     }
@@ -23,24 +23,24 @@ export async function GET(request: NextRequest) {
     
     if (!path) {
       return NextResponse.json(
-        { error: '未提供文件路径' },
+        { error: 'File path not provided' },
         { status: 400 }
       )
     }
 
-    // 检查文件是否属于当前用户
+    // Check if file belongs to current user
     if (!path.startsWith(user.id + '/')) {
       return NextResponse.json(
-        { error: '无权限访问该文件' },
+        { error: 'No permission to access this file' },
         { status: 403 }
       )
     }
 
-    // 创建服务端媒体服务实例
+    // Create server-side media service instance
     const serverMediaService = createServerMediaService()
 
     if (signed) {
-      // 获取带签名的私有下载链接
+      // Get signed private download link
       const downloadUrl = await serverMediaService.getMediaDownloadUrl(path, bucket, expiresIn)
       
       return NextResponse.json({
@@ -51,12 +51,12 @@ export async function GET(request: NextRequest) {
         }
       })
     } else {
-      // 获取公共URL
+      // Get public URL
       const urlResult = await serverMediaService.getPublicUrl(bucket, path)
       
       if (urlResult.error || !urlResult.data) {
         return NextResponse.json(
-          { error: '获取文件URL失败' },
+          { error: 'Failed to get file URL' },
           { status: 500 }
         )
       }
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Download error:', error)
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : '下载失败' },
+      { error: error instanceof Error ? error.message : 'Download failed' },
       { status: 500 }
     )
   }

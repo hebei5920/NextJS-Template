@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     const supabase = createClient()
 
     try {
-      // 交换授权码获取会话
+      // Exchange authorization code for session
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
       if (error) {
@@ -23,7 +23,7 @@ export async function GET(request: Request) {
       if (data.user) {
         try {
 
-          // 使用我们的认证处理器处理用户
+          // Use our auth handler to process user
           await AuthService.handleOAuthCallback(data.user)
 
           return NextResponse.redirect(`${origin}${next}`)
@@ -31,22 +31,22 @@ export async function GET(request: Request) {
 
         } catch (userError) {
           console.error('Error processing user in OAuth callback:', userError)
-          // 用户处理失败，但 Supabase 认证成功，重定向到错误页面
-          return NextResponse.redirect(`${origin}/auth/error?error=${encodeURIComponent('用户数据处理失败')}`)
+          // User processing failed, but Supabase auth succeeded, redirect to error page
+          return NextResponse.redirect(`${origin}/auth/error?error=${encodeURIComponent('User data processing failed')}`)
         }
       } else {
         console.error('No user data received from Supabase')
-        return NextResponse.redirect(`${origin}/auth/error?error=${encodeURIComponent('未收到用户数据')}`)
+        return NextResponse.redirect(`${origin}/auth/error?error=${encodeURIComponent('No user data received')}`)
       }
 
     } catch (error) {
       console.error('Unexpected error in OAuth callback:', error)
-      return NextResponse.redirect(`${origin}/auth/error?error=${encodeURIComponent('认证过程中发生错误')}`)
+      return NextResponse.redirect(`${origin}/auth/error?error=${encodeURIComponent('Error occurred during authentication')}`)
     }
   }
 
-  // 没有授权码，重定向到错误页面
-  return NextResponse.redirect(`${origin}/auth/error?error=${encodeURIComponent('缺少授权码')}`)
+  // No authorization code, redirect to error page
+  return NextResponse.redirect(`${origin}/auth/error?error=${encodeURIComponent('Missing authorization code')}`)
 }
 
 

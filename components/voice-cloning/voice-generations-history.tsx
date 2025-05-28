@@ -117,8 +117,8 @@ export function VoiceGenerationsHistory() {
     try {
       // 显示下载开始提示
       showToast({
-        title: '开始下载',
-        description: '正在准备下载音频文件...',
+        title: t('components.voiceGenerations.downloadStart'),
+        description: t('components.voiceGenerations.downloadStartDescription'),
         type: 'info',
         duration: 2000
       });
@@ -155,16 +155,16 @@ export function VoiceGenerationsHistory() {
       
       // 显示成功提示
       showToast({
-        title: '下载成功',
-        description: '音频文件已开始下载',
+        title: t('components.voiceGenerations.downloadSuccess'),
+        description: t('components.voiceGenerations.downloadSuccessDescription'),
         type: 'success',
         duration: 2000
       });
     } catch (error) {
       console.error('Download failed:', error);
       showToast({
-        title: '下载失败',
-        description: '无法下载音频文件，请稍后重试',
+        title: t('components.voiceGenerations.downloadFailed'),
+        description: t('components.voiceGenerations.downloadFailedDescription'),
         type: 'error'
       });
     }
@@ -175,10 +175,10 @@ export function VoiceGenerationsHistory() {
     const previewText = inputText.length > 50 ? inputText.substring(0, 50) + '...' : inputText;
     
     showConfirm({
-      title: '删除语音生成记录',
-      description: `确定要删除这条语音生成记录吗？\n\n内容预览："${previewText}"\n\n删除后将无法恢复。`,
-      confirmText: '删除',
-      cancelText: '取消',
+      title: t('components.voiceGenerations.deleteConfirmTitle'),
+      description: t('components.voiceGenerations.deleteConfirmDescription').replace('{previewText}', previewText),
+      confirmText: t('components.voiceGenerations.delete'),
+      cancelText: t('components.voiceGenerations.cancel'),
       type: 'danger',
       icon: <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />,
       onConfirm: async () => {
@@ -197,22 +197,22 @@ export function VoiceGenerationsHistory() {
             setVoiceGenerations(prev => prev.filter(record => record.id !== id));
             // 显示成功提示
             showToast({
-              title: '删除成功',
-              description: '语音生成记录已成功删除',
+              title: t('components.voiceGenerations.deleteSuccess'),
+              description: t('components.voiceGenerations.deleteSuccessDescription'),
               type: 'success'
             });
           } else {
             showToast({
-              title: '删除失败',
-              description: result.error || '删除失败，请重试',
+              title: t('components.voiceGenerations.deleteFailed'),
+              description: result.error || t('components.voiceGenerations.deleteFailedDescription'),
               type: 'error'
             });
           }
         } catch (error) {
           console.error('Failed to delete voice generation:', error);
           showToast({
-            title: '删除失败',
-            description: '网络连接错误，请检查后重试',
+            title: t('components.voiceGenerations.deleteFailed'),
+            description: t('components.voiceGenerations.networkError'),
             type: 'error'
           });
         }
@@ -227,7 +227,7 @@ export function VoiceGenerationsHistory() {
       
       // 检查日期是否有效
       if (isNaN(date.getTime())) {
-        return '日期无效';
+        return t('components.voiceGenerations.dateFormatting.invalidDate');
       }
       
       const now = new Date();
@@ -241,11 +241,11 @@ export function VoiceGenerationsHistory() {
       const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
       
       if (diffDays === 0) {
-        return '今天';
+        return t('components.voiceGenerations.dateFormatting.today');
       } else if (diffDays === 1) {
-        return '昨天';
+        return t('components.voiceGenerations.dateFormatting.yesterday');
       } else if (diffDays < 7) {
-        return `${diffDays}天前`;
+        return t('components.voiceGenerations.dateFormatting.daysAgo').replace('{days}', diffDays.toString());
       } else {
         return date.toLocaleDateString('zh-CN', {
           year: 'numeric',
@@ -255,7 +255,7 @@ export function VoiceGenerationsHistory() {
       }
     } catch (error) {
       console.error('Date formatting error:', error);
-      return '日期格式错误';
+      return t('components.voiceGenerations.dateFormatting.formatError');
     }
   };
 
@@ -263,7 +263,7 @@ export function VoiceGenerationsHistory() {
   const estimateDuration = (text: string) => {
     // 假设每分钟约150个字符
     const minutes = Math.ceil(text.length / 150);
-    return minutes > 0 ? `${minutes}分钟` : '< 1分钟';
+    return minutes > 0 ? t('components.voiceGenerations.estimatedDuration.minutes').replace('{minutes}', minutes.toString()) : t('components.voiceGenerations.estimatedDuration.lessThanMinute');
   };
 
   const LoadingSkeleton = ({ count = 5 }: { count?: number }) => (
@@ -309,27 +309,27 @@ export function VoiceGenerationsHistory() {
           <div className="text-3xl font-bold text-primary mb-2">
             {totalGenerations}
           </div>
-          <div className="text-sm text-muted-foreground">总生成数</div>
+          <div className="text-sm text-muted-foreground">{t('components.voiceGenerations.totalGenerations')}</div>
         </div>
         <div className="glass-card p-6 text-center">
           <div className="text-3xl font-bold text-primary mb-2">
             {totalCharacters.toLocaleString()}
           </div>
-          <div className="text-sm text-muted-foreground">总字符数</div>
+          <div className="text-sm text-muted-foreground">{t('components.voiceGenerations.totalCharacters')}</div>
         </div>
         <div className="glass-card p-6 text-center">
           <div className="text-3xl font-bold text-primary mb-2">
             {uniqueModels}
           </div>
-          <div className="text-sm text-muted-foreground">使用模型数</div>
+          <div className="text-sm text-muted-foreground">{t('components.voiceGenerations.modelsUsed')}</div>
         </div>
       </div>
 
       {/* 生成历史列表 */}
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold">语音生成记录</h3>
+        <h3 className="text-xl font-semibold">{t('components.voiceGenerations.generationRecords')}</h3>
         <div className="text-sm text-muted-foreground">
-          {voiceGenerations.length} 条记录
+          {voiceGenerations.length} {t('components.voiceGenerations.recordsCount')}
         </div>
       </div>
 
@@ -338,12 +338,12 @@ export function VoiceGenerationsHistory() {
       ) : voiceGenerations.length === 0 ? (
         <div className="text-center py-16">
           <Volume2 className="h-16 w-16 text-muted-foreground mx-auto mb-6" />
-          <h3 className="text-xl font-medium mb-3">暂无生成记录</h3>
+          <h3 className="text-xl font-medium mb-3">{t('components.voiceGenerations.noRecords')}</h3>
           <p className="text-muted-foreground mb-6">
-            开始生成您的第一段AI语音吧！
+            {t('components.voiceGenerations.noRecordsDescription')}
           </p>
           <button className="btn-primary">
-            开始生成语音
+            {t('components.voiceGenerations.startGeneration')}
           </button>
         </div>
       ) : (
@@ -362,10 +362,10 @@ export function VoiceGenerationsHistory() {
                       />
                     )}
                     <span className="text-sm font-medium text-muted-foreground">
-                      {record.voiceModel?.displayName || '未知模型'}
+                      {record.voiceModel?.displayName || t('components.voiceGenerations.unknownModel')}
                     </span>
                     <span className="text-xs px-2 py-1 bg-muted rounded-full">
-                      {record.voiceModel?.gender === 'male' ? '男声' : '女声'}
+                      {record.voiceModel?.gender === 'male' ? t('components.voiceGenerations.male') : t('components.voiceGenerations.female')}
                     </span>
                     <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">
                       {record.model}
@@ -388,10 +388,10 @@ export function VoiceGenerationsHistory() {
                       {estimateDuration(record.inputText)}
                     </div>
                     <div>
-                      字符数: {record.billableCharactersCount}
+                      {t('components.voiceGenerations.charactersCount')}: {record.billableCharactersCount}
                     </div>
                     <div>
-                      格式: {record.audioFormat.toUpperCase()}
+                      {t('components.voiceGenerations.format')}: {record.audioFormat.toUpperCase()}
                     </div>
                   </div>
                 </div>
@@ -405,12 +405,12 @@ export function VoiceGenerationsHistory() {
                     {playingId === record.id.toString() ? (
                       <>
                         <Pause className="h-4 w-4" />
-                        暂停
+                        {t('components.voiceGenerations.pause')}
                       </>
                     ) : (
                       <>
                         <Play className="h-4 w-4" />
-                        播放
+                        {t('components.voiceGenerations.play')}
                       </>
                     )}
                   </button>
@@ -418,16 +418,16 @@ export function VoiceGenerationsHistory() {
                   <button
                     onClick={() => downloadAudio(record)}
                     className="btn-secondary flex items-center gap-1 text-sm"
-                    title="下载音频"
+                    title={t('components.voiceGenerations.download')}
                   >
                     <Download className="h-4 w-4" />
-                    下载
+                    {t('components.voiceGenerations.download')}
                   </button>
                   
                   <button
                     onClick={() => deleteGeneration(record.id, record.inputText)}
                     className="text-red-500 hover:text-red-700 p-2 rounded transition-colors"
-                    title="删除记录"
+                    title={t('components.voiceGenerations.deleteRecord')}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>

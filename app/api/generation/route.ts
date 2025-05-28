@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
     try {
-        // 验证用户身份
+        // Verify user identity
         const supabase = createClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { text, voiceUrl } = body;
 
-        // 输入验证
+        // Input validation
         if (!text || typeof text !== 'string') {
             return NextResponse.json(
                 { error: 'Text is required and must be a string' },
@@ -47,13 +47,13 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 模拟处理时间（在实际应用中这里会调用真实的AI服务）
+        // Simulate processing time (in real application this would call actual AI service)
         await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
 
-        // 模拟生成结果（实际应用中这里会返回真实的生成音频URL）
+        // Simulate generation result (in real application this would return actual generated audio URL)
         const generatedAudioUrl = `data:audio/wav;base64,${Buffer.from('mock-audio-data').toString('base64')}`;
 
-        // 记录生成历史（可选）
+        // Record generation history (optional)
         try {
             await supabase
                 .from('voice_generations')
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
             data: {
                 text: text,
                 audioUrl: generatedAudioUrl,
-                duration: Math.ceil(text.length / 10), // 模拟音频时长
+                duration: Math.ceil(text.length / 10), // Simulate audio duration
                 generatedAt: new Date().toISOString()
             }
         });

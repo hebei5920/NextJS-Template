@@ -41,7 +41,7 @@ export class OrderService {
             return newOrder;
         } catch (error) {
             console.error('Error creating order:', error);
-            throw new Error('创建订单失败');
+            throw new Error('Failed to create order');
         }
     }
 
@@ -54,8 +54,8 @@ export class OrderService {
                 where: { id }
             });
         } catch (error) {
-            console.error('Error getting order by ID:', error);
-            throw new Error('获取订单失败');
+            console.error('Error getting order:', error);
+            throw new Error('Failed to get order');
         }
     }
 
@@ -69,8 +69,8 @@ export class OrderService {
                 orderBy: { createDate: 'desc' }
             });
         } catch (error) {
-            console.error('Error getting orders by user ID:', error);
-            throw new Error('获取用户订单失败');
+            console.error('Error getting user orders:', error);
+            throw new Error('Failed to get user orders');
         }
     }
 
@@ -90,7 +90,7 @@ export class OrderService {
             return updatedOrder;
         } catch (error) {
             console.error('Error updating order:', error);
-            throw new Error('更新订单失败');
+            throw new Error('Failed to update order');
         }
     }
 
@@ -110,7 +110,7 @@ export class OrderService {
             return updatedOrder;
         } catch (error) {
             console.error('Error updating order status:', error);
-            throw new Error('更新订单状态失败');
+            throw new Error('Failed to update order status');
         }
     }
 
@@ -145,7 +145,7 @@ export class OrderService {
             });
         } catch (error) {
             console.error('Error deleting order:', error);
-            throw new Error('删除订单失败');
+            throw new Error('Failed to delete order');
         }
     }
 
@@ -177,8 +177,8 @@ export class OrderService {
                 totalPages: Math.ceil(total / limit)
             };
         } catch (error) {
-            console.error('Error getting all orders:', error);
-            throw new Error('获取订单列表失败');
+            console.error('Error getting order list:', error);
+            throw new Error('Failed to get order list');
         }
     }
 
@@ -193,7 +193,7 @@ export class OrderService {
             });
         } catch (error) {
             console.error('Error getting orders by status:', error);
-            throw new Error('获取订单失败');
+            throw new Error('Failed to get orders');
         }
     }
 
@@ -225,7 +225,7 @@ export class OrderService {
             };
         } catch (error) {
             console.error('Error getting user order stats:', error);
-            throw new Error('获取用户订单统计失败');
+            throw new Error('Failed to get user order statistics');
         }
     }
 } 

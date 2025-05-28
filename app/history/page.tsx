@@ -2,8 +2,11 @@
 
 import { Navbar } from '@/components/ui/navbar';
 import { VoiceGenerationsHistory } from '@/components/voice-cloning/voice-generations-history';
+import { useTranslation } from '@/providers/language-provider';
 
 export default function HistoryPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -13,10 +16,10 @@ export default function HistoryPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-3xl md:text-4xl font-bold mb-4">
-              生成历史
+              {t('history.title')}
             </h1>
             <p className="text-xl text-muted-foreground">
-              查看和管理您的所有AI语音生成记录
+              {t('history.subtitle')}
             </p>
           </div>
           

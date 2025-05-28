@@ -49,14 +49,14 @@ export class MediaService extends StorageService {
    * 验证 userId 是否有效
    */
   private validateUserId(userId: string): void {
-    if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
-      throw new Error('userId 是必需的，且不能为空')
+    if (!userId || userId.trim() === '') {
+      throw new Error('userId is required and cannot be empty')
     }
-    
-    // 验证 userId 格式（UUID格式）
-    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-    if (!uuidPattern.test(userId.trim())) {
-      throw new Error('userId 格式无效，必须是有效的 UUID')
+
+    // Validate userId format (UUID format)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    if (!uuidRegex.test(userId)) {
+      throw new Error('Invalid userId format, must be a valid UUID')
     }
   }
 
@@ -71,7 +71,7 @@ export class MediaService extends StorageService {
 
     // 验证是否为图片
     if (!SUPPORTED_IMAGE_TYPES.includes(file.type)) {
-      throw new Error('只支持图片文件上传')
+      throw new Error('Only image files are supported for upload')
     }
 
     const folder = this.getFileType(file.type)
@@ -85,12 +85,12 @@ export class MediaService extends StorageService {
     })
 
     if (uploadResult.error || !uploadResult.data) {
-      throw uploadResult.error || new Error('上传失败')
+      throw uploadResult.error || new Error('Upload failed')
     }
 
     const urlResult = await this.getPublicUrl(bucket, path)
     if (urlResult.error || !urlResult.data) {
-      throw urlResult.error || new Error('获取URL失败')
+      throw urlResult.error || new Error('Failed to get URL')
     }
 
     return {
@@ -112,7 +112,7 @@ export class MediaService extends StorageService {
 
     // 验证是否为视频
     if (!SUPPORTED_VIDEO_TYPES.includes(file.type)) {
-      throw new Error('只支持视频文件上传')
+      throw new Error('Only video files are supported for upload')
     }
 
     const folder = this.getFileType(file.type)
@@ -126,12 +126,12 @@ export class MediaService extends StorageService {
     })
 
     if (uploadResult.error || !uploadResult.data) {
-      throw uploadResult.error || new Error('上传失败')
+      throw uploadResult.error || new Error('Upload failed')
     }
 
     const urlResult = await this.getPublicUrl(bucket, path)
     if (urlResult.error || !urlResult.data) {
-      throw urlResult.error || new Error('获取URL失败')
+      throw urlResult.error || new Error('Failed to get URL')
     }
 
     return {
@@ -153,7 +153,7 @@ export class MediaService extends StorageService {
 
     // 验证是否为音频
     if (!SUPPORTED_AUDIO_TYPES.includes(file.type)) {
-      throw new Error('只支持音频文件上传')
+      throw new Error('Only audio files are supported for upload')
     }
 
     const folder = this.getFileType(file.type)
@@ -167,12 +167,12 @@ export class MediaService extends StorageService {
     })
 
     if (uploadResult.error || !uploadResult.data) {
-      throw uploadResult.error || new Error('上传失败')
+      throw uploadResult.error || new Error('Upload failed')
     }
 
     const urlResult = await this.getPublicUrl(bucket, path)
     if (urlResult.error || !urlResult.data) {
-      throw urlResult.error || new Error('获取URL失败')
+      throw urlResult.error || new Error('Failed to get URL')
     }
 
     return {
@@ -200,7 +200,7 @@ export class MediaService extends StorageService {
       case 'audio':
         return this.uploadAudio(options)
       default:
-        throw new Error('不支持的文件类型')
+        throw new Error('Unsupported file type')
     }
   }
 
@@ -269,11 +269,11 @@ export class MediaService extends StorageService {
   async getMediaDownloadUrl(path: string, bucket = this.DEFAULT_BUCKET, expiresIn = 3600): Promise<string> {
     const result = await this.getSignedUrl(bucket, path, expiresIn)
 
-    if (result.error || !result.data?.signedUrl) {
-      throw result.error || new Error('获取下载链接失败')
+    if (result.error || !result.data) {
+      throw result.error || new Error('Failed to get download link')
     }
 
-    return result.data.signedUrl
+    return result.data.signedUrl!
   }
 
   /**
