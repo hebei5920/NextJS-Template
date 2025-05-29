@@ -1,4 +1,3 @@
-import { prisma } from './index'
 import { User } from '@prisma/client'
 import { getUserBySupabaseId, updateUserLoginTime, createUser, getUserByEmail, updateUser } from './user'
 import { userValidation } from './user'
