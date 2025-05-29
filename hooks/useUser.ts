@@ -35,7 +35,7 @@ export function useUser() {
    */
   const getUserInfo = async (): Promise<User | null> => {
     if (!authUser) {
-      setState(prev => ({ ...prev, error: '请先登录' }))
+      setState(prev => ({ ...prev, error: 'Please login first' }))
       return null
     }
 
@@ -53,7 +53,7 @@ export function useUser() {
 
       return userInfo
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '获取用户信息失败'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to get user information'
       setState(prev => ({ ...prev, loading: false, error: errorMessage }))
       return null
     }
@@ -80,13 +80,13 @@ export function useUser() {
    */
   const addUserCredits = async (amount: number): Promise<User | null> => {
     if (!authUser) {
-      setState(prev => ({ ...prev, error: '请先登录' }))
+      setState(prev => ({ ...prev, error: 'Please login first' }))
       return null
     }
 
     // 验证积分值
     if (isNaN(amount) || amount <= 0) {
-      setState(prev => ({ ...prev, error: '积分增加值必须为正数' }))
+      setState(prev => ({ ...prev, error: 'Credit increase value must be positive' }))
       return null
     }
 
@@ -104,7 +104,7 @@ export function useUser() {
 
       return updatedUser
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '增加积分失败'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to add credits'
       setState(prev => ({ ...prev, loading: false, error: errorMessage }))
       return null
     }
@@ -115,13 +115,13 @@ export function useUser() {
    */
   const deductUserCredits = async (amount: number): Promise<User | null> => {
     if (!authUser) {
-      setState(prev => ({ ...prev, error: '请先登录' }))
+      setState(prev => ({ ...prev, error: 'Please login first' }))
       return null
     }
 
     // 验证积分值
     if (isNaN(amount) || amount <= 0) {
-      setState(prev => ({ ...prev, error: '积分扣减值必须为正数' }))
+      setState(prev => ({ ...prev, error: 'Credit deduction value must be positive' }))
       return null
     }
 
@@ -132,12 +132,12 @@ export function useUser() {
       const userInfo = await getUserBySupabaseId(authUser.id)
 
       if (!userInfo) {
-        throw new Error('用户不存在')
+        throw new Error('User does not exist')
       }
 
       // 检查积分是否足够
       if (userInfo.credits < amount) {
-        throw new Error('积分不足')
+        throw new Error('Insufficient credits')
       }
 
       // 计算新的积分值
@@ -154,7 +154,7 @@ export function useUser() {
 
       return updatedUser
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '扣减积分失败'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to deduct credits'
       setState(prev => ({ ...prev, loading: false, error: errorMessage }))
       return null
     }
@@ -165,13 +165,13 @@ export function useUser() {
    */
   const setUserCredits = async (amount: number): Promise<User | null> => {
     if (!authUser) {
-      setState(prev => ({ ...prev, error: '请先登录' }))
+      setState(prev => ({ ...prev, error: 'Please login first' }))
       return null
     }
 
     // 验证积分值
     if (!userValidation.isValidCredits(amount)) {
-      setState(prev => ({ ...prev, error: '积分值必须为非负数' }))
+      setState(prev => ({ ...prev, error: 'Credit value must be non-negative' }))
       return null
     }
 
@@ -189,7 +189,7 @@ export function useUser() {
 
       return updatedUser
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '设置积分失败'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to set credits'
       setState(prev => ({ ...prev, loading: false, error: errorMessage }))
       return null
     }
@@ -200,7 +200,7 @@ export function useUser() {
    */
   const updateUserPlan = async (plan: UserPlan): Promise<User | null> => {
     if (!authUser) {
-      setState(prev => ({ ...prev, error: '请先登录' }))
+      setState(prev => ({ ...prev, error: 'Please login first' }))
       return null
     }
 
@@ -208,7 +208,7 @@ export function useUser() {
     if (!userValidation.isValidPlan(plan)) {
       setState(prev => ({
         ...prev,
-        error: `无效的套餐类型，必须是以下之一: free, basic, pro, enterprise`
+        error: `Invalid plan type, must be one of the following: free, basic, pro, enterprise`
       }))
       return null
     }
@@ -227,7 +227,7 @@ export function useUser() {
 
       return updatedUser
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '更新套餐失败'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update plan'
       setState(prev => ({ ...prev, loading: false, error: errorMessage }))
       return null
     }
@@ -238,7 +238,7 @@ export function useUser() {
    */
   const hasEnoughCredits = async (amount: number): Promise<boolean> => {
     if (!authUser) {
-      setState(prev => ({ ...prev, error: '请先登录' }))
+      setState(prev => ({ ...prev, error: 'Please login first' }))
       return false
     }
 
@@ -246,7 +246,7 @@ export function useUser() {
       const userInfo = await getUserInfo()
       return userInfo ? userInfo.credits >= amount : false
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '检查积分失败'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to check credits'
       setState(prev => ({ ...prev, error: errorMessage }))
       return false
     }
@@ -257,13 +257,13 @@ export function useUser() {
    */
   const consumeCredits = async (amount: number, feature: string): Promise<boolean> => {
     if (!authUser) {
-      setState(prev => ({ ...prev, error: '请先登录' }))
+      setState(prev => ({ ...prev, error: 'Please login first' }))
       return false
     }
 
     // 验证积分值
     if (isNaN(amount) || amount <= 0) {
-      setState(prev => ({ ...prev, error: '消费积分值必须为正数' }))
+      setState(prev => ({ ...prev, error: 'Consumption credit value must be positive' }))
       return false
     }
 
@@ -276,7 +276,7 @@ export function useUser() {
       if (!hasEnough) {
         setState(prev => ({
           ...prev,
-          error: '积分不足，无法使用此功能',
+          error: 'Insufficient credits, cannot use this feature',
           loading: false
         }))
         return false
@@ -286,16 +286,16 @@ export function useUser() {
       const updatedUser = await deductUserCredits(amount)
 
       if (!updatedUser) {
-        throw new Error('扣减积分失败')
+        throw new Error('Failed to deduct credits')
       }
 
       // 这里可以添加积分消费记录逻辑
-      console.log(`用户 ${authUser.id} 使用了 ${amount} 积分用于 ${feature}`)
+      console.log(`User ${authUser.id} used ${amount} credits for ${feature}`)
 
       setState(prev => ({ ...prev, loading: false }))
       return true
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '消费积分失败'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to consume credits'
       setState(prev => ({ ...prev, loading: false, error: errorMessage }))
       return false
     }

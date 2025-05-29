@@ -49,7 +49,7 @@ export function useOrders() {
    */
   const getUserOrders = async (page = 1, pageSize = 10): Promise<{orders: Order[], total: number} | null> => {
     if (!user) {
-      setState(prev => ({ ...prev, error: '请先登录' }))
+      setState(prev => ({ ...prev, error: 'Please log in first' }))
       return null
     }
 
@@ -71,7 +71,7 @@ export function useOrders() {
       
       return result
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '获取订单失败'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch orders'
       setState(prev => ({ ...prev, loading: false, error: errorMessage }))
       return null
     }
@@ -82,7 +82,7 @@ export function useOrders() {
    */
   const getOrder = async (orderId: number): Promise<Order | null> => {
     if (!user) {
-      setState(prev => ({ ...prev, error: '请先登录' }))
+      setState(prev => ({ ...prev, error: 'Please log in first' }))
       return null
     }
 
@@ -93,13 +93,13 @@ export function useOrders() {
       
       // 检查订单是否属于当前用户
       if (order && order.userId !== user.id) {
-        throw new Error('无权限访问该订单')
+        throw new Error('No permission to access this order')
       }
       
       setState(prev => ({ ...prev, loading: false }))
       return order
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '获取订单详情失败'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch order details'
       setState(prev => ({ ...prev, loading: false, error: errorMessage }))
       return null
     }
@@ -117,7 +117,7 @@ export function useOrders() {
     status: string = 'pending'
   ): Promise<Order | null> => {
     if (!user) {
-      setState(prev => ({ ...prev, error: '请先登录' }))
+      setState(prev => ({ ...prev, error: 'Please log in first' }))
       return null
     }
 
@@ -145,7 +145,7 @@ export function useOrders() {
       
       return order
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '创建订单失败'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create order'
       setState(prev => ({ ...prev, loading: false, error: errorMessage }))
       return null
     }
@@ -156,7 +156,7 @@ export function useOrders() {
    */
   const updateOrderState = async (orderId: number, status: string): Promise<Order | null> => {
     if (!user) {
-      setState(prev => ({ ...prev, error: '请先登录' }))
+      setState(prev => ({ ...prev, error: 'Please log in first' }))
       return null
     }
 
@@ -167,11 +167,11 @@ export function useOrders() {
       const existingOrder = await getOrderById(orderId)
       
       if (!existingOrder) {
-        throw new Error('订单不存在')
+        throw new Error('Order does not exist')
       }
       
       if (existingOrder.userId !== user.id) {
-        throw new Error('无权限操作该订单')
+        throw new Error('No permission to operate this order')
       }
       
       // 更新订单状态
@@ -188,7 +188,7 @@ export function useOrders() {
       
       return updatedOrder
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '更新订单状态失败'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update order status'
       setState(prev => ({ ...prev, loading: false, error: errorMessage }))
       return null
     }
@@ -199,7 +199,7 @@ export function useOrders() {
    */
   const cancelUserOrder = async (orderId: number): Promise<Order | null> => {
     if (!user) {
-      setState(prev => ({ ...prev, error: '请先登录' }))
+      setState(prev => ({ ...prev, error: 'Please log in first' }))
       return null
     }
 
@@ -210,16 +210,16 @@ export function useOrders() {
       const existingOrder = await getOrderById(orderId)
       
       if (!existingOrder) {
-        throw new Error('订单不存在')
+        throw new Error('Order does not exist')
       }
       
       if (existingOrder.userId !== user.id) {
-        throw new Error('无权限操作该订单')
+        throw new Error('No permission to operate this order')
       }
       
       // 检查订单是否可以取消（只有待处理的订单可以取消）
       if (existingOrder.status !== 'pending') {
-        throw new Error('只有待处理的订单可以取消')
+        throw new Error('Only pending orders can be cancelled')
       }
       
       // 取消订单
@@ -236,7 +236,7 @@ export function useOrders() {
       
       return updatedOrder
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '取消订单失败'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to cancel order'
       setState(prev => ({ ...prev, loading: false, error: errorMessage }))
       return null
     }
@@ -248,7 +248,7 @@ export function useOrders() {
    */
   const createCheckoutSession = async (type: 'basic' | 'pro'): Promise<string | null> => {
     if (!user) {
-      setState(prev => ({ ...prev, error: '请先登录' }))
+      setState(prev => ({ ...prev, error: 'Please log in first' }))
       return null
     }
 
@@ -269,7 +269,7 @@ export function useOrders() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || `创建结账会话失败: ${response.status}`)
+        throw new Error(errorData.message || `Failed to create checkout session: ${response.status}`)
       }
 
       // 从响应中获取会话信息
@@ -278,7 +278,7 @@ export function useOrders() {
       // 重定向到Stripe结账页面
       const stripe = await stripePromise
       if (!stripe) {
-        throw new Error('Stripe加载失败')
+        throw new Error('Failed to load Stripe')
       }
       
       // 使用会话ID重定向到Stripe结账页面
@@ -293,7 +293,7 @@ export function useOrders() {
       setState(prev => ({ ...prev, loading: false }))
       return session.id
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : '创建结账会话失败'
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create checkout session'
       setState(prev => ({ ...prev, loading: false, error: errorMessage }))
       return null
     }

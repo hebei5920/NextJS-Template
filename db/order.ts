@@ -52,32 +52,32 @@ export const orderValidation = {
 export async function createOrder(data: Prisma.OrderCreateInput): Promise<Order> {
   // 验证用户 ID
   if (!data.user?.connect?.supabaseId || !userValidation.isValidSupabaseId(data.user.connect.supabaseId)) {
-    throw new Error('无效的用户 ID')
+    throw new Error('Invalid user ID')
   }
 
   // 验证商品名称
   if (!orderValidation.isValidProduct(data.product)) {
-    throw new Error('无效的商品名称')
+    throw new Error('Invalid product name')
   }
 
   // 验证价格
   if (!orderValidation.isValidPrice(data.price || null)) {
-    throw new Error('无效的价格')
+    throw new Error('Invalid price')
   }
 
   // 验证支付邮箱
   if (data.payEmail && !orderValidation.isValidEmail(data.payEmail)) {
-    throw new Error('无效的支付邮箱')
+    throw new Error('Invalid payment email')
   }
 
   // 验证货币
   if (data.payCurrency && !orderValidation.isValidCurrency(data.payCurrency)) {
-    throw new Error('无效的货币代码')
+    throw new Error('Invalid currency code')
   }
 
   // 验证状态
   if (data.status && !orderValidation.isValidStatus(data.status)) {
-    throw new Error('无效的订单状态')
+    throw new Error('Invalid order status')
   }
 
   try {
@@ -88,7 +88,7 @@ export async function createOrder(data: Prisma.OrderCreateInput): Promise<Order>
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       // 外键约束错误
       if (error.code === 'P2003') {
-        throw new Error('用户不存在')
+        throw new Error('User does not exist')
       }
     }
     
@@ -110,32 +110,32 @@ export async function createOrderSimple(
 ): Promise<Order> {
   // 验证用户 ID
   if (!userValidation.isValidSupabaseId(userId)) {
-    throw new Error('无效的用户 ID')
+    throw new Error('Invalid user ID')
   }
 
   // 验证商品名称
   if (!orderValidation.isValidProduct(product)) {
-    throw new Error('无效的商品名称')
+    throw new Error('Invalid product name')
   }
 
   // 验证价格
   if (price !== undefined && !orderValidation.isValidPrice(price)) {
-    throw new Error('无效的价格')
+    throw new Error('Invalid price')
   }
 
   // 验证支付邮箱
   if (payEmail && !orderValidation.isValidEmail(payEmail)) {
-    throw new Error('无效的支付邮箱')
+    throw new Error('Invalid payment email')
   }
 
   // 验证货币
   if (payCurrency && !orderValidation.isValidCurrency(payCurrency)) {
-    throw new Error('无效的货币代码')
+    throw new Error('Invalid currency code')
   }
 
   // 验证状态
   if (!orderValidation.isValidStatus(status)) {
-    throw new Error('无效的订单状态')
+    throw new Error('Invalid order status')
   }
 
   try {
@@ -158,7 +158,7 @@ export async function createOrderSimple(
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       // 外键约束错误
       if (error.code === 'P2003') {
-        throw new Error('用户不存在')
+        throw new Error('User does not exist')
       }
     }
     
@@ -171,7 +171,7 @@ export async function createOrderSimple(
  */
 export async function getOrderById(id: number): Promise<Order | null> {
   if (isNaN(id) || id <= 0) {
-    throw new Error('无效的订单 ID')
+    throw new Error('Invalid order ID')
   }
 
   return prisma.order.findUnique({
@@ -185,15 +185,15 @@ export async function getOrderById(id: number): Promise<Order | null> {
 export async function getOrdersByUserId(userId: string, page = 1, pageSize = 10): Promise<{ orders: Order[]; total: number }> {
   // 验证用户 ID
   if (!userValidation.isValidSupabaseId(userId)) {
-    throw new Error('无效的用户 ID')
+    throw new Error('Invalid user ID')
   }
 
   if (isNaN(page) || page < 1) {
-    throw new Error('页码必须为正整数')
+    throw new Error('Page number must be a positive integer')
   }
 
   if (isNaN(pageSize) || pageSize < 1) {
-    throw new Error('每页数量必须为正整数')
+    throw new Error('Items per page must be a positive integer')
   }
 
   const skip = (page - 1) * pageSize
@@ -224,32 +224,32 @@ export async function getOrdersByUserId(userId: string, page = 1, pageSize = 10)
 export async function updateOrder(id: number, data: Prisma.OrderUpdateInput): Promise<Order> {
   // 验证订单 ID
   if (isNaN(id) || id <= 0) {
-    throw new Error('无效的订单 ID')
+    throw new Error('Invalid order ID')
   }
 
   // 验证商品名称
   if (data.product && typeof data.product === 'string' && !orderValidation.isValidProduct(data.product)) {
-    throw new Error('无效的商品名称')
+    throw new Error('Invalid product name')
   }
 
   // 验证价格
   if (data.price !== undefined && !orderValidation.isValidPrice(data.price as number | null)) {
-    throw new Error('无效的价格')
+    throw new Error('Invalid price')
   }
 
   // 验证支付邮箱
   if (data.payEmail !== undefined && !orderValidation.isValidEmail(data.payEmail as string | null)) {
-    throw new Error('无效的支付邮箱')
+    throw new Error('Invalid payment email')
   }
 
   // 验证货币
   if (data.payCurrency !== undefined && !orderValidation.isValidCurrency(data.payCurrency as string | null)) {
-    throw new Error('无效的货币代码')
+    throw new Error('Invalid currency code')
   }
 
   // 验证状态
   if (data.status && typeof data.status === 'string' && !orderValidation.isValidStatus(data.status)) {
-    throw new Error('无效的订单状态')
+    throw new Error('Invalid order status')
   }
 
   try {
@@ -263,11 +263,11 @@ export async function updateOrder(id: number, data: Prisma.OrderUpdateInput): Pr
   } catch (error: unknown) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2025') {
-        throw new Error('订单不存在')
+        throw new Error('Order does not exist')
       }
       // 外键约束错误
       if (error.code === 'P2003') {
-        throw new Error('用户不存在')
+        throw new Error('User does not exist')
       }
     }
     
@@ -281,12 +281,12 @@ export async function updateOrder(id: number, data: Prisma.OrderUpdateInput): Pr
 export async function updateOrderStatus(id: number, status: string): Promise<Order> {
   // 验证订单 ID
   if (isNaN(id) || id <= 0) {
-    throw new Error('无效的订单 ID')
+    throw new Error('Invalid order ID')
   }
 
   // 验证状态
   if (!orderValidation.isValidStatus(status)) {
-    throw new Error('无效的订单状态')
+    throw new Error('Invalid order status')
   }
 
   try {
@@ -300,7 +300,7 @@ export async function updateOrderStatus(id: number, status: string): Promise<Ord
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2025') {
-        throw new Error('订单不存在')
+        throw new Error('Order does not exist')
       }
     }
     
@@ -335,7 +335,7 @@ export async function failOrder(id: number): Promise<Order> {
 export async function deleteOrder(id: number): Promise<void> {
   // 验证订单 ID
   if (isNaN(id) || id <= 0) {
-    throw new Error('无效的订单 ID')
+    throw new Error('Invalid order ID')
   }
 
   try {
@@ -345,7 +345,7 @@ export async function deleteOrder(id: number): Promise<void> {
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2025') {
-        throw new Error('订单不存在')
+        throw new Error('Order does not exist')
       }
     }
     
@@ -363,11 +363,11 @@ export async function getAllOrders(page = 1, pageSize = 20): Promise<{
   totalPages: number;
 }> {
   if (isNaN(page) || page < 1) {
-    throw new Error('页码必须为正整数')
+    throw new Error('Page number must be a positive integer')
   }
 
   if (isNaN(pageSize) || pageSize < 1) {
-    throw new Error('每页数量必须为正整数')
+    throw new Error('Items per page must be a positive integer')
   }
 
   const skip = (page - 1) * pageSize
@@ -402,15 +402,15 @@ export async function getOrdersByStatus(status: string, page = 1, pageSize = 20)
 }> {
   // 验证状态
   if (!orderValidation.isValidStatus(status)) {
-    throw new Error('无效的订单状态')
+    throw new Error('Invalid order status')
   }
 
   if (isNaN(page) || page < 1) {
-    throw new Error('页码必须为正整数')
+    throw new Error('Page number must be a positive integer')
   }
 
   if (isNaN(pageSize) || pageSize < 1) {
-    throw new Error('每页数量必须为正整数')
+    throw new Error('Items per page must be a positive integer')
   }
 
   const skip = (page - 1) * pageSize
@@ -448,7 +448,7 @@ export async function getUserOrderStats(userId: string): Promise<{
 }> {
   // 验证用户 ID
   if (!userValidation.isValidSupabaseId(userId)) {
-    throw new Error('无效的用户 ID')
+    throw new Error('Invalid user ID')
   }
 
   try {
@@ -488,6 +488,6 @@ export async function getUserOrderStats(userId: string): Promise<{
     }
   } catch (error) {
     console.error('Error getting user order stats:', error)
-    throw new Error('获取用户订单统计失败')
+    throw new Error('Failed to get user order statistics')
   }
 }

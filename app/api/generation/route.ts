@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
   if (authError || !user) {
     return NextResponse.json(
-      { error: '请先登录' },
+      { error: 'Please login first' },
       { status: 401 }
     );
   }
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     // 验证请求参数
     if (!body.prompt) {
       return NextResponse.json(
-        { error: '缺少必要的参数' },
+        { error: 'Missing required parameters' },
         { status: 400 }
       );
     }
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     console.error('Generation error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : '生成过程中发生错误' },
+      { error: error instanceof Error ? error.message : 'Error occurred during generation' },
       { status: 500 }
     );
   }

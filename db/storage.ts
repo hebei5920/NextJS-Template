@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase-client'
 import { createClient as createServerClient } from '@/lib/supabase-server'
 import { SupabaseClient } from '@supabase/supabase-js'
 
-// 文件类型常量
+// File type constants
 export const SUPPORTED_IMAGE_TYPES = [
   'image/jpeg',
   'image/jpg',
@@ -35,53 +35,53 @@ export const ALL_SUPPORTED_TYPES = [
   ...SUPPORTED_AUDIO_TYPES
 ]
 
-// 文件大小限制 (bytes)
+// File size limits (bytes)
 export const FILE_SIZE_LIMITS = {
   image: 10 * 1024 * 1024, // 10MB
   video: 100 * 1024 * 1024, // 100MB
   audio: 50 * 1024 * 1024, // 50MB
 }
 
-// 响应类型定义
+// Response type definition
 export interface StorageResponse<T = any> {
   data: T | null
   error: Error | null
 }
 
-// 存储操作接口
+// Storage operations interface
 export interface StorageOperations {
-  // 文件上传
+  // File upload
   uploadFile(bucket: string, path: string, file: File, options?: UploadOptions): Promise<StorageResponse<FileObject>>
   uploadFiles(bucket: string, files: FileUpload[]): Promise<StorageResponse<FileObject[]>>
   
-  // 文件管理
+  // File management
   downloadFile(bucket: string, path: string): Promise<StorageResponse<Blob>>
   getPublicUrl(bucket: string, path: string): Promise<StorageResponse<{ publicUrl: string }>>
   getSignedUrl(bucket: string, path: string, expiresIn?: number): Promise<StorageResponse<{ signedUrl: string }>>
   
-  // 文件删除
+  // File deletion
   deleteFile(bucket: string, path: string): Promise<StorageResponse<void>>
   deleteFiles(bucket: string, paths: string[]): Promise<StorageResponse<{ successful: string[], failed: string[] }>>
   
-  // 文件操作
+  // File operations
   moveFile(bucket: string, fromPath: string, toPath: string): Promise<StorageResponse<void>>
   copyFile(bucket: string, fromPath: string, toPath: string): Promise<StorageResponse<void>>
   
-  // 文件列表
+  // File listing
   listFiles(bucket: string, path: string, options?: ListOptions): Promise<StorageResponse<FileObject[]>>
   
-  // 桶操作
+  // Bucket operations
   createBucket(name: string, options?: BucketOptions): Promise<StorageResponse<void>>
   deleteBucket(name: string): Promise<StorageResponse<void>>
   emptyBucket(name: string): Promise<StorageResponse<void>>
   listBuckets(): Promise<StorageResponse<Bucket[]>>
   
-  // 工具方法
+  // Utility methods
   generateFilePath(file: File, userId?: string, folder?: string): string
   validateFile(file: File): ValidationResult
 }
 
-// 类型定义
+// Type definitions
 export interface UploadOptions {
   upsert?: boolean
   cacheControl?: string
@@ -133,7 +133,7 @@ export interface ValidationResult {
 }
 
 /**
- * Supabase 存储操作实现
+ * Supabase storage operations implementation
  */
 class SupabaseStorage implements StorageOperations {
   private client: SupabaseClient
@@ -143,7 +143,7 @@ class SupabaseStorage implements StorageOperations {
   }
 
   /**
-   * 生成唯一文件路径
+   * Generate unique file path
    */
   generateFilePath(file: File, userId?: string, folder?: string): string {
     const timestamp = Date.now()
@@ -166,7 +166,7 @@ class SupabaseStorage implements StorageOperations {
   }
 
   /**
-   * 验证文件类型和大小
+   * Validate file type and size
    */
   validateFile(file: File): ValidationResult {
     // 检查文件类型
@@ -204,8 +204,8 @@ class SupabaseStorage implements StorageOperations {
   }
 
   /**
-   * 上传单个文件
-   * 原子性操作: 单个文件上传是原子性的，成功或失败都会返回明确的结果
+   * Upload single file
+   * Atomic operation: Single file upload is atomic, success or failure will return a clear result
    */
   async uploadFile(
     bucket: string, 
@@ -257,8 +257,8 @@ class SupabaseStorage implements StorageOperations {
   }
 
   /**
-   * 批量上传文件
-   * 原子性操作: 使用事务保证批量上传的原子性，所有文件要么全部成功，要么全部失败
+   * Batch upload files
+   * Atomic operation: Uses transactions to ensure atomic batch uploads, all files either succeed or fail
    */
   async uploadFiles(
     bucket: string, 
@@ -305,7 +305,7 @@ class SupabaseStorage implements StorageOperations {
   }
 
   /**
-   * 下载文件
+   * Download file
    */
   async downloadFile(bucket: string, path: string): Promise<StorageResponse<Blob>> {
     try {
@@ -323,7 +323,7 @@ class SupabaseStorage implements StorageOperations {
   }
 
   /**
-   * 获取文件的公共URL
+   * Get public URL for file
    */
   async getPublicUrl(bucket: string, path: string): Promise<StorageResponse<{ publicUrl: string }>> {
     try {
@@ -346,7 +346,7 @@ class SupabaseStorage implements StorageOperations {
   }
 
   /**
-   * 获取带签名的私有URL
+   * Get signed private URL
    */
   async getSignedUrl(
     bucket: string, 
@@ -371,14 +371,14 @@ class SupabaseStorage implements StorageOperations {
     } catch (error: unknown) {
       return {
         data: null,
-        error: error instanceof Error ? error : new Error('获取签名URL失败')
+        error: error instanceof Error ? error : new Error('Failed to get signed URL')
       }
     }
   }
 
   /**
-   * 删除单个文件
-   * 原子性操作: 单个文件删除是原子性的
+   * Delete single file
+   * Atomic operation: Single file deletion is atomic
    */
   async deleteFile(bucket: string, path: string): Promise<StorageResponse<void>> {
     try {
@@ -390,14 +390,14 @@ class SupabaseStorage implements StorageOperations {
     } catch (error: unknown) {
       return {
         data: null,
-        error: error instanceof Error ? error : new Error('删除文件失败')
+        error: error instanceof Error ? error : new Error('Failed to delete file')
       }
     }
   }
 
   /**
-   * 批量删除文件
-   * 原子性操作: 返回成功和失败的文件列表，可以用于实现事务回滚
+   * Batch delete files
+   * Atomic operation: Returns lists of successful and failed files, can be used to implement transaction rollback
    */
   async deleteFiles(
     bucket: string, 
@@ -428,14 +428,14 @@ class SupabaseStorage implements StorageOperations {
     } catch (error: unknown) {
       return {
         data: null,
-        error: error instanceof Error ? error : new Error('批量删除文件失败')
+        error: error instanceof Error ? error : new Error('Failed to batch delete files')
       }
     }
   }
 
   /**
-   * 移动/重命名文件
-   * 原子性操作: 使用事务保证移动操作的原子性
+   * Move/rename file
+   * Atomic operation: Uses transactions to ensure atomic move operations
    */
   async moveFile(bucket: string, fromPath: string, toPath: string): Promise<StorageResponse<void>> {
     try {
@@ -447,13 +447,13 @@ class SupabaseStorage implements StorageOperations {
     } catch (error: unknown) {
       return {
         data: null,
-        error: error instanceof Error ? error : new Error('移动文件失败')
+        error: error instanceof Error ? error : new Error('Failed to move file')
       }
     }
   }
 
   /**
-   * 复制文件
+   * Copy file
    */
   async copyFile(bucket: string, fromPath: string, toPath: string): Promise<StorageResponse<void>> {
     try {
@@ -465,13 +465,13 @@ class SupabaseStorage implements StorageOperations {
     } catch (error: unknown) {
       return {
         data: null,
-        error: error instanceof Error ? error : new Error('复制文件失败')
+        error: error instanceof Error ? error : new Error('Failed to copy file')
       }
     }
   }
 
   /**
-   * 列出文件夹中的文件
+   * List files in folder
    */
   async listFiles(
     bucket: string, 
@@ -511,13 +511,13 @@ class SupabaseStorage implements StorageOperations {
     } catch (error: unknown) {
       return {
         data: null,
-        error: error instanceof Error ? error : new Error('列出文件失败')
+        error: error instanceof Error ? error : new Error('Failed to list files')
       }
     }
   }
 
   /**
-   * 创建存储桶
+   * Create storage bucket
    */
   async createBucket(name: string, options?: BucketOptions): Promise<StorageResponse<void>> {
     try {
@@ -531,13 +531,13 @@ class SupabaseStorage implements StorageOperations {
     } catch (error: unknown) {
       return {
         data: null,
-        error: error instanceof Error ? error : new Error('创建存储桶失败')
+        error: error instanceof Error ? error : new Error('Failed to create storage bucket')
       }
     }
   }
 
   /**
-   * 删除存储桶
+   * Delete storage bucket
    */
   async deleteBucket(name: string): Promise<StorageResponse<void>> {
     try {
@@ -546,13 +546,13 @@ class SupabaseStorage implements StorageOperations {
     } catch (error: unknown) {
       return {
         data: null,
-        error: error instanceof Error ? error : new Error('删除存储桶失败')
+        error: error instanceof Error ? error : new Error('Failed to delete storage bucket')
       }
     }
   }
 
   /**
-   * 清空存储桶
+   * Empty storage bucket
    */
   async emptyBucket(name: string): Promise<StorageResponse<void>> {
     try {
@@ -561,13 +561,13 @@ class SupabaseStorage implements StorageOperations {
     } catch (error: unknown) {
       return {
         data: null,
-        error: error instanceof Error ? error : new Error('清空存储桶失败')
+        error: error instanceof Error ? error : new Error('Failed to empty storage bucket')
       }
     }
   }
 
   /**
-   * 获取存储桶列表
+   * Get storage bucket list
    */
   async listBuckets(): Promise<StorageResponse<Bucket[]>> {
     try {
@@ -576,23 +576,23 @@ class SupabaseStorage implements StorageOperations {
     } catch (error: unknown) {
       return {
         data: null,
-        error: error instanceof Error ? error : new Error('获取存储桶列表失败')
+        error: error instanceof Error ? error : new Error('Failed to get bucket list')
       }
     }
   }
 }
 
-// 创建存储服务实例
+// Create storage service instance
 export const supabaseStorage = new SupabaseStorage()
 
-// 服务端存储实例的工厂函数
+// Factory function for server-side storage instance
 export const createServerStorage = () => new SupabaseStorage(true)
 
-// 事务工具函数
+// Transaction utility functions
 export const storageTransactions = {
   /**
-   * 原子操作: 批量上传文件事务
-   * 保证多个文件要么全部上传成功，要么全部失败
+   * Atomic operation: Batch file upload transaction
+   * Ensures multiple files are either all successfully uploaded or all fail
    */
   async uploadFilesTransaction(
     storage: SupabaseStorage,
@@ -603,8 +603,8 @@ export const storageTransactions = {
   },
 
   /**
-   * 原子操作: 批量删除文件事务
-   * 返回成功和失败的文件，可以用于进一步处理
+   * Atomic operation: Batch file deletion transaction
+   * Returns successful and failed files, can be used for further processing
    */
   async deleteFilesTransaction(
     storage: SupabaseStorage,
@@ -615,8 +615,8 @@ export const storageTransactions = {
   },
 
   /**
-   * 原子操作: 移动文件夹事务
-   * 确保文件夹中的所有文件都被正确移动，或者回滚所有操作
+   * Atomic operation: Move folder transaction
+   * Ensures all files in the folder are properly moved, or rolls back all operations
    */
   async moveFolderTransaction(
     storage: SupabaseStorage,
@@ -669,14 +669,14 @@ export const storageTransactions = {
     } catch (error: unknown) {
       return {
         data: null,
-        error: error instanceof Error ? error : new Error('移动文件夹失败')
+        error: error instanceof Error ? error : new Error('Failed to move folder')
       }
     }
   },
 
   /**
-   * 原子操作: 替换文件事务
-   * 确保旧文件被新文件替代，失败时回滚到旧文件
+   * Atomic operation: Replace file transaction
+   * Ensures old file is replaced by new file, rolls back to old file on failure
    */
   async replaceFileTransaction(
     storage: SupabaseStorage,
@@ -705,7 +705,7 @@ export const storageTransactions = {
     } catch (error: unknown) {
       return {
         data: null,
-        error: error instanceof Error ? error : new Error('替换文件失败')
+        error: error instanceof Error ? error : new Error('Failed to replace file')
       }
     }
   },

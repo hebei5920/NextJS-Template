@@ -12,23 +12,23 @@ export const authValidation = {
    */
   validateSupabaseUser(supabaseUser: any): { isValid: boolean; error?: string } {
     if (!supabaseUser) {
-      return { isValid: false, error: 'Supabase 用户对象为空' }
+      return { isValid: false, error: 'Supabase user object is empty' }
     }
 
     if (!supabaseUser.id) {
-      return { isValid: false, error: 'Supabase 用户 ID 为空' }
+      return { isValid: false, error: 'Supabase user ID is empty' }
     }
 
     if (!userValidation.isValidSupabaseId(supabaseUser.id)) {
-      return { isValid: false, error: '无效的 Supabase ID 格式' }
+      return { isValid: false, error: 'Invalid Supabase ID format' }
     }
 
     if (!supabaseUser.email) {
-      return { isValid: false, error: 'Supabase 用户邮箱为空' }
+      return { isValid: false, error: 'Supabase user email is empty' }
     }
 
     if (!userValidation.isValidEmail(supabaseUser.email)) {
-      return { isValid: false, error: '无效的邮箱格式' }
+      return { isValid: false, error: 'Invalid email format' }
     }
 
     return { isValid: true }
