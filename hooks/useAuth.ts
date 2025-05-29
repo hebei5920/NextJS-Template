@@ -9,6 +9,7 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
+  
   useEffect(() => {
     // 获取初始用户状态
     supabase.auth.getUser().then(({ data: { user } }) => {
