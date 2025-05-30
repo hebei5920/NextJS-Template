@@ -27,7 +27,6 @@ export const languages: readonly LanguageConfig[] = [
     { code: 'it', name: 'Italian', nativeName: 'Italiano', flag: '🇮🇹', dir: 'ltr' }
 ] as const;
 
-// 类型安全的辅助函数
 export function isValidLocale(locale: string): locale is Locale {
     return locales.includes(locale as Locale);
 }
