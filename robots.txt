@@ -1,2 +1,40 @@
+# Global rules
 User-agent: *
 Allow: /
+Disallow: /api/*
+Disallow: /_next/*
+Disallow: /*?*
+Disallow: /login
+
+# Specific rules for Google
+User-agent: Googlebot
+Allow: /
+Allow: /*.js
+Allow: /*.css
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.gif
+Allow: /*.svg
+Allow: /*.ico
+Crawl-delay: 1
+
+User-agent: Googlebot
+Disallow: /no-google/
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Disallow: /no-bing/
+Crawl-delay: 2
+
+User-agent: Baiduspider
+Disallow: /no-baidu/
+Crawl-delay: 3
+
+User-agent: *
+Disallow: /admin/
+Disallow: /private/
+Allow: /
+
+# Sitemap
+Sitemap: https://yourdomain.com/sitemap.xml
