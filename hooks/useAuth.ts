@@ -43,7 +43,7 @@ export function useAuth() {
     supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`
+        redirectTo: `${window.location.origin}/api/auth/callback`
       }
     })
   }
@@ -52,11 +52,11 @@ export function useAuth() {
     supabase.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`
+        redirectTo: `${window.location.origin}/api/auth/callback`
       }
     })
   }
-  
+
   useEffect(() => {
     // 获取初始用户状态
     supabase.auth.getUser().then(({ data: { user } }) => {
