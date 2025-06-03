@@ -1,0 +1,30 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Styling Guidelines
+
+The project uses Tailwind CSS with additional utilities:
+
+## Configuration Files
+- [tailwind.config.ts](mdc:tailwind.config.ts) - Tailwind configuration
+- [postcss.config.js](mdc:postcss.config.js) - PostCSS configuration
+
+
+## UI Specifications
+- Use shadcn-ui as the base UI framework.
+- The generated UI styles should be aesthetically pleasing.
+- Do not use native browser components such as prompt, confirm, or alert.
+
+
+## Page Specifications
+- [utils.ts](mdc:lib/utils.ts) cn function
+- [app/login/page.tsx](mdc:app/login/page.tsx) - Login Page
+- [app/auth/error/page.tsx](mdc:app/auth/error/page.tsx)- The authentication failure page, where the route parameter will carry error.message.
+- [app/stripe/success/page.tsx](mdc:app/stripe/success/page.tsx) - The payment success page
+- [app/stripe/cancel/page.tsx](mdc:app/stripe/cancel/page.tsx)- The payment cancellation page.
+- [components/UI](mdc:components/UI)- UI component code.
+- [components](mdc:components) - Business component code.
+- The provider for theme switching is located at providers/theme-provider.tsx
+- You are not allowed to modify the code in db/, hooks/, i18n/, lib/, /prisma, or supabase/.

@@ -1,0 +1,35 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Next.js Template Project Overview
+
+This is a modern Next.js 13+ template with the following key features:
+
+## Core Files
+- [app/layout.tsx](mdc:app/layout.tsx) - Root layout with theme and internationalization setup
+- [middleware.ts](mdc:middleware.ts) - Next.js middleware for handling routing and auth
+- [next.config.mjs](mdc:next.config.mjs) - Next.js configuration
+- [tailwind.config.ts](mdc:tailwind.config.ts) - Tailwind CSS configuration
+-
+
+## Key Directories
+- `app/` - Next.js app router pages and components
+- `i18n/` - Internationalization configuration and translations
+- `providers/` - React context providers
+- `hooks/` - Custom React hooks
+- `types/` - TypeScript type definitions
+- `prisma/` - Prisma ORM schema and migrations
+- `supabase/` - Supabase configuration and types
+- `db/` - The implementation of all atomic operations in the database.
+
+## Features
+- TypeScript support
+- Tailwind CSS for styling
+- Dark mode support via next-themes
+- Internationalization with next-intl
+- Database integration ready (Prisma & Supabase)
+- Form handling with react-hook-form and zod
+
+- Authentication ready with Supabase Auth

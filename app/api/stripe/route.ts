@@ -52,8 +52,8 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
             ],
             client_reference_id: user.id,
             customer_email: user.email,
-            success_url: `${req.headers.get('origin')}/success`,
-            cancel_url: `${req.headers.get('origin')}/canceled`,
+            success_url: `${req.headers.get('origin')}/stripe/success`,
+            cancel_url: `${req.headers.get('origin')}/stripe/canceled`,
             metadata: {
                 type,
                 interval,

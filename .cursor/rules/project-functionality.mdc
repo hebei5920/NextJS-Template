@@ -1,0 +1,23 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# functionality Guidelines
+
+## core files 
+- [useAuth.ts](mdc:hooks/useAuth.ts) Implementation of user authentication and logout
+- [useOrders.ts](mdc:hooks/useOrders.ts) Implementation of CRUD operations for orders
+- [useStorage.ts](mdc:hooks/useStorage.ts) Implementation of Audio, Video, and Image File Storage Using Supabase
+- [useUser.ts](mdc:hooks/useUser.ts) Implementation of user basic information modification, points modification, and package modification
+- [stripe.ts](mdc:lib/stripe.ts) The method for obtaining Stripe on the client side.
+- [supabase-client.ts](mdc:lib/supabase-client.ts) The method for creating Supabase on the client side.
+- [supabase-server.ts](mdc:lib/supabase-server.ts) The method for creating Supabase on the server side.
+- [app/api/auth/callback](mdc:app/api/auth/callback) The logic for redirecting after third-party login is completed.
+- [app/api/generate](mdc:app/api/generate) Store the generation logic.
+- [app/api/orders](mdc:app/api/orders) Stripe's webhooks.
+- The folder `db/` contains the atomic operations for the database and generally does not need to be modified.
+
+## Features
+- CRUD operations are completed using hooks.
+- Login, logout, language switching, and payment functions have already been encapsulated; do not download any additional packages.
