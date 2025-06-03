@@ -10,33 +10,13 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
-  const signOut = () => {
-    const cookiesStore = cookies()
-    const allCookies = cookiesStore.getAll()
-    allCookies.forEach(ck => {
-      cookiesStore.delete(ck.name)
+  const signOut = async () => {
+    // 先调用服务端删除 cookie
+    await fetch('/api/auth/signout', {
+      method: 'POST',
     })
-
-
-    const supabaseCookieNames = [
-      'sb-access-token',
-      'sb-refresh-token',
-      'supabase-auth-token',
-      'supabase.auth.token'
-    ];
-
-    supabaseCookieNames.forEach(name => {
-      cookiesStore.delete(name);
-      cookiesStore.set(name, '', {
-        expires: new Date(0),
-        path: '/',
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
-      });
-    });
-
-    supabase.auth.signOut()
+    // 然后清除客户端状态
+    await supabase.auth.signOut()
   }
 
   const signInWithGoogle = () => {
