@@ -5,11 +5,7 @@ alwaysApply: false
 ---
 # functionality Guidelines
 
-## core files 
-- [useAuth.ts](mdc:hooks/useAuth.ts) Implementation of user authentication and logout
-- [useOrders.ts](mdc:hooks/useOrders.ts) Implementation of CRUD operations for orders
-- [useStorage.ts](mdc:hooks/useStorage.ts) Implementation of Audio, Video, and Image File Storage Using Supabase
-- [useUser.ts](mdc:hooks/useUser.ts) Implementation of user basic information modification, points modification, and package modification
+## core files  
 - [stripe.ts](mdc:lib/stripe.ts) The method for obtaining Stripe on the client side.
 - [supabase-client.ts](mdc:lib/supabase-client.ts) The method for creating Supabase on the client side.
 - [supabase-server.ts](mdc:lib/supabase-server.ts) The method for creating Supabase on the server side.

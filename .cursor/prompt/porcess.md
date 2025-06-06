@@ -27,7 +27,7 @@ pnpx prisma db push
 ### 上线
 - supabase: Authentication=>URL Configuration
 - change redirect uri
-- 
+- pnpm install && pnpx prisma generate
 
 
 

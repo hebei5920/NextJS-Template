@@ -92,7 +92,7 @@ export async function createUser(data: Prisma.UserCreateInput): Promise<User> {
         }
       }
     }
-    
+
     throw error
   }
 }
@@ -186,7 +186,7 @@ export async function updateUser(id: number, data: Prisma.UserUpdateInput): Prom
         }
       }
     }
-    
+
     throw error
   }
 }
@@ -236,7 +236,7 @@ export async function updateUserBySupabaseId(supabaseId: string, data: Prisma.Us
         }
       }
     }
-    
+
     throw error
   }
 }
@@ -266,7 +266,7 @@ export async function updateUserCredits(supabaseId: string, credits: number): Pr
         throw new Error('用户不存在')
       }
     }
-    
+
     throw error
   }
 }
@@ -300,7 +300,7 @@ export async function addUserCredits(supabaseId: string, amount: number): Promis
         throw new Error('用户不存在')
       }
     }
-    
+
     throw error
   }
 }
@@ -370,7 +370,7 @@ export async function updateUserLoginTime(supabaseId: string): Promise<User> {
         throw new Error('用户不存在')
       }
     }
-    
+
     throw error
   }
 }
